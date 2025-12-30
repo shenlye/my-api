@@ -9,7 +9,8 @@ export const posts = pgTable("posts", {
 	categories: text("categories").array().notNull().default([]),
 	tags: text("tags").array().notNull().default([]),
 	cover: text("cover"),
+	isPublished: text("isPublished").notNull().default("false"),
 
 	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow().$onUpdate(() => new Date()),
 });
