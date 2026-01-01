@@ -10,7 +10,8 @@ export const seedDefaultUser = async () => {
         if (result.value === 0) {
             console.log("Creating default admin...");
 
-            const rawPassword = process.env.DEFAULT_ADMIN_PASSWORD || crypto.randomUUID();
+            const rawPassword =
+                process.env.DEFAULT_ADMIN_PASSWORD || crypto.randomUUID();
             const passwordHash = await Bun.password.hash(rawPassword);
 
             await db.insert(users).values({
@@ -27,4 +28,4 @@ export const seedDefaultUser = async () => {
     } catch (error) {
         console.error("Failed to seed default user:", error);
     }
-}
+};

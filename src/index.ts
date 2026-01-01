@@ -8,20 +8,20 @@ const app = new OpenAPIHono();
 await seedDefaultUser();
 
 app.get("/", (c) => {
-	return c.text("Hello Hono!");
+    return c.text("Hello Hono!");
 });
 
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
-	type: "http",
-	scheme: "bearer",
+    type: "http",
+    scheme: "bearer",
 });
 
 app.doc("/doc", {
-	openapi: "3.0.0",
-	info: {
-		version: "1.0.0",
-		title: "My API",
-	},
+    openapi: "3.0.0",
+    info: {
+        version: "1.0.0",
+        title: "My API",
+    },
 });
 
 app.get("/scalar", Scalar({ url: "/doc" }));
