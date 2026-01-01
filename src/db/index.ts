@@ -33,7 +33,7 @@ export const seedDefaultUser = async () => {
                 console.log(`password: ${rawPassword}`);
             } else {
                 console.log(
-                    "Password has been generated. Check logs or set DEFAULT_ADMIN_PASSWORD environment variable.",
+                    "Password has been auto-generated. Set DEFAULT_ADMIN_PASSWORD environment variable to use a custom password.",
                 );
             }
             console.log("-----------------------------------------");
