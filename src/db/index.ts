@@ -5,22 +5,26 @@ import { users } from "./schema";
 export const db = drizzle(process.env.DATABASE_URL!);
 
 export const seedDefaultUser = async () => {
-    const [result] = await db.select({value: count()}).from(users)
-    if(result.value === 0){
-        console.log("Creating default admin...")
+    try {
+        const [result] = await db.select({ value: count() }).from(users);
+        if (result.value === 0) {
+            console.log("Creating default admin...");
 
-        const defaultPassword = "admin123"
-        const passwordHash = await Bun.password.hash(defaultPassword)
+            const defaultPassword = "admin123";
+            const passwordHash = await Bun.password.hash(defaultPassword);
 
-        await db.insert(users).values({
-            username: "admin",
-            passwordHash: passwordHash,
-        })
+            await db.insert(users).values({
+                username: "admin",
+                passwordHash: passwordHash,
+            });
 
-        console.log("-----------------------------------------");
-        console.log("Default admin created")
-        console.log("username: admin")
-        console.log(`password: ${defaultPassword}`)
-        console.log("-----------------------------------------");
+            console.log("-----------------------------------------");
+            console.log("Default admin created");
+            console.log("username: admin");
+            console.log(`password: ${defaultPassword}`);
+            console.log("-----------------------------------------");
+        }
+    } catch (error) {
+        console.error("Failed to seed default user:", error);
     }
 }
