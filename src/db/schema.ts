@@ -17,3 +17,14 @@ export const posts = pgTable("posts", {
 		.defaultNow()
 		.$onUpdate(() => new Date()),
 });
+
+export const users = pgTable("users", {
+	id: serial("id").primaryKey(),
+	username: text("username").notNull().unique(),
+	passwordHash: text("passwordHash").notNull(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt")
+		.notNull()
+		.defaultNow()
+		.$onUpdate(() => new Date()),
+});

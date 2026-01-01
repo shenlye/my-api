@@ -1,8 +1,11 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+import { seedDefaultUser } from "./db";
 import postsRouter from "./routes/posts/index";
 
 const app = new OpenAPIHono();
+
+seedDefaultUser();
 
 app.get("/", (c) => {
 	return c.text("Hello Hono!");
