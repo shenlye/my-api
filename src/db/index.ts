@@ -7,7 +7,9 @@ export const db = drizzle(process.env.DATABASE_URL!);
 export const seedDefaultUser = async () => {
     try {
         const [result] = await db.select({ value: count() }).from(users);
-        if (result.value === 0) {
+        const userCount = result?.value ?? 0;
+
+        if (userCount === 0) {
             console.log("Creating default admin...");
 
             const rawPassword =
@@ -22,7 +24,18 @@ export const seedDefaultUser = async () => {
             console.log("-----------------------------------------");
             console.log("Default admin created");
             console.log("username: admin");
-            console.log(`password: ${rawPassword}`);
+
+            // Only log password in development mode or if explicitly set via env var
+            const isDevelopment = process.env.NODE_ENV !== "production";
+            const isExplicitPassword = !!process.env.DEFAULT_ADMIN_PASSWORD;
+
+            if (isDevelopment || isExplicitPassword) {
+                console.log(`password: ${rawPassword}`);
+            } else {
+                console.log(
+                    "Password has been auto-generated. Set DEFAULT_ADMIN_PASSWORD environment variable to use a custom password.",
+                );
+            }
             console.log("-----------------------------------------");
         }
     } catch (error) {
