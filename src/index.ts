@@ -5,7 +5,7 @@ import postsRouter from "./routes/posts/index";
 
 const app = new OpenAPIHono();
 
-seedDefaultUser();
+await seedDefaultUser();
 
 app.get("/", (c) => {
 	return c.text("Hello Hono!");
