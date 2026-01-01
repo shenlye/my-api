@@ -68,6 +68,11 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
     );
 };
 
+interface PostgresError extends Error {
+    code?: string;
+    detail?: string;
+}
+
 export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
     c,
 ) => {
@@ -76,11 +81,7 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
     try {
         const result = await db
             .insert(posts)
-            .values({
-                title,
-                content,
-                slug,
-            })
+            .values({ title, content, slug })
             .returning();
 
         return c.json(
@@ -94,10 +95,10 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
             },
             201,
         );
-    } catch (error: any) {
-        const pgError = error.cause || error;
+    } catch (e) {
+        const error = e as PostgresError;
 
-        if (pgError.code === "23505") {
+        if (error.code === "23505") {
             return c.json(
                 {
                     error: "Conflict",
@@ -112,7 +113,7 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         return c.json(
             {
                 message: "服务器内部错误",
-                error: error.message,
+                error: error.message || "Unknown database error",
             },
             500,
         );

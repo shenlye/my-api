@@ -2,7 +2,14 @@ import { count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { users } from "./schema";
 
-export const db = drizzle(process.env.DATABASE_URL!);
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+    console.error("ERROR: DATABASE_URL is missing in environment variables.");
+    process.exit(1);
+}
+
+export const db = drizzle(databaseUrl);
 
 export const seedDefaultUser = async () => {
     try {
@@ -10,32 +17,28 @@ export const seedDefaultUser = async () => {
         const userCount = result?.value ?? 0;
 
         if (userCount === 0) {
+            const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
+
+            if (!defaultAdminPassword) {
+                console.error("ERROR: DEFAULT_ADMIN_PASSWORD is not set.");
+                process.exit(1);
+            }
+
             console.log("Creating default admin...");
 
-            const rawPassword =
-                process.env.DEFAULT_ADMIN_PASSWORD || crypto.randomUUID();
-            const passwordHash = await Bun.password.hash(rawPassword);
+            const passwordHash = await Bun.password.hash(defaultAdminPassword);
 
-            await db.insert(users).values({
-                username: "admin",
-                passwordHash: passwordHash,
-            });
+            await db
+                .insert(users)
+                .values({
+                    username: "admin",
+                    passwordHash: passwordHash,
+                })
+                .onConflictDoNothing();
 
             console.log("-----------------------------------------");
             console.log("Default admin created");
             console.log("username: admin");
-
-            // Only log password in development mode or if explicitly set via env var
-            const isDevelopment = process.env.NODE_ENV !== "production";
-            const isExplicitPassword = !!process.env.DEFAULT_ADMIN_PASSWORD;
-
-            if (isDevelopment || isExplicitPassword) {
-                console.log(`password: ${rawPassword}`);
-            } else {
-                console.log(
-                    "Password has been auto-generated. Set DEFAULT_ADMIN_PASSWORD environment variable to use a custom password.",
-                );
-            }
             console.log("-----------------------------------------");
         }
     } catch (error) {
