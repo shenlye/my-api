@@ -10,8 +10,8 @@ export const seedDefaultUser = async () => {
         if (result.value === 0) {
             console.log("Creating default admin...");
 
-            const defaultPassword = "admin123";
-            const passwordHash = await Bun.password.hash(defaultPassword);
+            const rawPassword = process.env.DEFAULT_ADMIN_PASSWORD || crypto.randomUUID();
+            const passwordHash = await Bun.password.hash(rawPassword);
 
             await db.insert(users).values({
                 username: "admin",
@@ -21,7 +21,7 @@ export const seedDefaultUser = async () => {
             console.log("-----------------------------------------");
             console.log("Default admin created");
             console.log("username: admin");
-            console.log(`password: ${defaultPassword}`);
+            console.log(`password: ${rawPassword}`);
             console.log("-----------------------------------------");
         }
     } catch (error) {
