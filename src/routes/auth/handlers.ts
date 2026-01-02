@@ -70,7 +70,7 @@ export const changePasswordHandler: RouteHandler<
         oldPassword,
         foundUser.passwordHash,
     );
-    
+
     if (!isMatch) {
         return c.json({ message: "Old password is incorrect" }, 401);
     }
