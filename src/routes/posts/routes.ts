@@ -16,7 +16,6 @@ export const getPostRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
-                        success: z.boolean().default(true),
                         data: PostSchema,
                     }),
                 },
@@ -39,7 +38,6 @@ export const listPostsRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
-                        success: z.boolean().default(true),
                         data: z.array(PostSchema.omit({ content: true })),
                         meta: z.object({
                             total: z.number(),
@@ -74,7 +72,6 @@ export const createPostRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
-                        success: z.boolean().default(true),
                         message: z.string(),
                         data: PostSchema,
                     }),
