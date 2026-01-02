@@ -3,6 +3,7 @@ import { createMiddleware } from "hono/factory";
 import { jwt } from "hono/jwt";
 import { z } from "zod";
 import { env } from "../lib/env";
+import { logger } from "../lib/logger";
 
 const jwtMiddleware = jwt({
     secret: env.JWT_SECRET,
@@ -13,7 +14,7 @@ export const authMiddleware = createMiddleware(
         try {
             return await jwtMiddleware(c, next);
         } catch (e) {
-            console.error("JWT Verification Failed:", e);
+            logger.error(e, "JWT Verification Failed:");
 
             return c.json({ error: "Unauthorized" }, 401);
         }

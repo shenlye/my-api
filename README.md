@@ -11,6 +11,7 @@ English version: [README_EN.md](README_EN.md)
 - Drizzle ORM - 数据库 ORM
 - Biome - 代码格式化和检查
 - PostgreSQL- 数据库
+- pino - 日志
 
 ## 本地开发
 
