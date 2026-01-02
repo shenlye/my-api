@@ -40,11 +40,11 @@ export const loginRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
-                        message: z.string(),
+                        error: z.string(),
                     }),
                 },
             },
-            description: "Too many login attempts, please try again later",
+            description: "Too many requests, please try again later",
         },
         500: {
             content: {
