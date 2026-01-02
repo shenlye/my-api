@@ -15,9 +15,7 @@ describe("Auth Security Tests", () => {
     test("should return 429 when login rate limit is exceeded", async () => {
         const testIp = "1.2.3.4";
 
-        for (let i = 0; i < 10; i++) {
-            await doLogin(testIp);
-        }
+        await Promise.all(Array.from({ length: 10 }).map(() => doLogin(testIp)));
 
         const blockedRes = await doLogin(testIp);
 
