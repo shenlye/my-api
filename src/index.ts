@@ -1,10 +1,17 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+import { logger as honoLogger } from "hono/logger";
 import { seedDefaultUser } from "./db";
+import { logger } from "./lib/logger";
 import authRouter from "./routes/auth/index";
 import postsRouter from "./routes/posts/index";
 
 const app = new OpenAPIHono();
+
+app.use(
+    "*",
+    honoLogger((str) => logger.info(str)),
+);
 
 await seedDefaultUser();
 
