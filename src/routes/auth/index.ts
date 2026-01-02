@@ -12,10 +12,15 @@ authRouter.use(
         limit: 10,
         standardHeaders: "draft-7",
         keyGenerator: (c) => {
+            const xff = c.req.header("x-forwarded-for");
+            const ipFromXff = xff?.split(",")[0]?.trim();
+
             return (
-                c.req.header("X-Forwarded-For") ||
+                ipFromXff ||
+                c.req.header("cf-connecting-ip") ||
                 c.req.header("x-real-ip") ||
-                "127.0.0.1"
+                // Avoid collapsing all clients into one bucket
+                `${c.req.header("user-agent") ?? "unknown"}|${c.req.path}`
             );
         },
     }),
