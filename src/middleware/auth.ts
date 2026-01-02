@@ -14,7 +14,7 @@ export const authMiddleware = createMiddleware(
         try {
             return await jwtMiddleware(c, next);
         } catch (e) {
-            logger.error(e, "JWT Verification Failed:");
+            logger.error({ err: e }, "JWT Verification Failed");
 
             return c.json({ error: "Unauthorized" }, 401);
         }
