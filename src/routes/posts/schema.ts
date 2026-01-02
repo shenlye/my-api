@@ -16,6 +16,7 @@ export const PostSchema = z
             .string()
             .nullable()
             .openapi({ example: "https://example.com/cover.jpg" }),
+        isPublished: z.boolean().openapi({ example: true }),
         createdAt: z.string().openapi({ example: "2023-01-01T00:00:00.000Z" }),
         updatedAt: z.string().openapi({ example: "2023-01-01T00:00:00.000Z" }),
     })
@@ -41,10 +42,10 @@ export const createPostSchema = z
             .string()
             .min(10, "Content is too short")
             .openapi({ example: "This is the content of the new post." }),
-        summary: z
+        description: z
             .string()
             .optional()
-            .openapi({ example: "A summary of the post" }),
+            .openapi({ example: "A short description of the post" }),
     })
     .openapi("CreatePost");
 

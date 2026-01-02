@@ -22,7 +22,7 @@ export const authMiddleware = createMiddleware(
 );
 
 const payloadSchema = z.object({
-    sub: z.string(),
+    sub: z.number(),
     role: z.enum(["admin", "user"]),
     exp: z.number(),
 });
