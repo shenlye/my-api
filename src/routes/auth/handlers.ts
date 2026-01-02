@@ -60,10 +60,7 @@ export const changePasswordHandler: RouteHandler<
     }
 
     if (oldPassword === newPassword) {
-        return c.json(
-            { message: "New password must be different from old password" },
-            400,
-        );
+        return c.json({ message: "Invalid request" }, 400);
     }
 
     const isMatch = await Bun.password.verify(
@@ -72,7 +69,7 @@ export const changePasswordHandler: RouteHandler<
     );
 
     if (!isMatch) {
-        return c.json({ message: "Old password is incorrect" }, 401);
+        return c.json({ message: "Invalid request" }, 400);
     }
 
     const newPasswordHash = await Bun.password.hash(newPassword);
