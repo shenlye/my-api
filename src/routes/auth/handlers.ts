@@ -4,7 +4,7 @@ import { sign } from "hono/jwt";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { env } from "../../lib/env";
-import type { loginRoute } from "./routers";
+import type { changePasswordRoute, loginRoute } from "./routers";
 
 export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
     const { identifier, password } = c.req.valid("json");
@@ -35,4 +35,41 @@ export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
     const token = await sign(payload, env.JWT_SECRET);
 
     return c.json({ token: token }, 200);
+};
+
+export const changePasswordHandler: RouteHandler<
+    typeof changePasswordRoute
+> = async (c) => {
+    const { oldPassword, newPassword } = c.req.valid("json");
+    const payload = c.get("jwtPayload");
+
+    const userId = payload.sub;
+
+    const user = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+    const foundUser = user[0];
+    if (!foundUser) {
+        return c.json({ message: "User not found" }, 404);
+    }
+
+    const isMatch = await Bun.password.verify(
+        oldPassword,
+        foundUser.passwordHash,
+    );
+    if (!isMatch) {
+        return c.json({ message: "Old password is incorrect" }, 401);
+    }
+
+    const newPasswordHash = await Bun.password.hash(newPassword);
+
+    await db
+        .update(users)
+        .set({ passwordHash: newPasswordHash })
+        .where(eq(users.id, userId));
+
+    return c.json({ message: "Password changed successfully" }, 200);
 };
