@@ -44,6 +44,7 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
                 cover: posts.cover,
                 createdAt: posts.createdAt,
                 updatedAt: posts.updatedAt,
+                isPublished: posts.isPublished,
             })
             .from(posts)
             .limit(limit)
