@@ -78,7 +78,7 @@ export const changePasswordHandler: RouteHandler<
         .set({ passwordHash: newPasswordHash })
         .where(eq(users.id, userId))
         .returning();
-    
+
     if (result.length === 0) {
         return c.json({ message: "User not found during update" }, 404);
     }
