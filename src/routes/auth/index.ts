@@ -12,16 +12,18 @@ authRouter.use(
         limit: 10,
         standardHeaders: "draft-7",
         keyGenerator: (c) => {
-            const xff = c.req.header("x-forwarded-for");
-            const ipFromXff = xff?.split(",")[0]?.trim();
+            const trustedIp =
+                c.req.header("cf-connecting-ip") || c.req.header("x-real-ip");
+            if (trustedIp) {
+                return trustedIp;
+            }
 
-            return (
-                ipFromXff ||
-                c.req.header("cf-connecting-ip") ||
-                c.req.header("x-real-ip") ||
-                // Avoid collapsing all clients into one bucket
-                `${c.req.header("user-agent") ?? "unknown"}|${c.req.path}`
-            );
+            const xff = c.req.header("x-forwarded-for");
+            const ips = xff?.split(",");
+            const lastIp = ips?.[ips.length - 1]?.trim();
+            if (lastIp) return lastIp;
+
+            return `${c.req.header("user-agent") ?? "unknown"}|${c.req.path}`;
         },
         message: {
             error: "Too many requests, please try again later.",

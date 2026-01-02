@@ -20,6 +20,7 @@ describe("Auth Security Tests", () => {
         }
 
         const blockedRes = await doLogin(testIp);
+
         expect(blockedRes.status).toBe(429);
 
         const ratelimit = blockedRes.headers.get("ratelimit");
