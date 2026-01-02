@@ -1,9 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { loginHandler } from "./handlers";
-import { loginRoute } from "./routers";
+import { changePasswordHandler, loginHandler } from "./handlers";
+import { changePasswordRoute, loginRoute } from "./routers";
 
 const authRouter = new OpenAPIHono();
 
 authRouter.openapi(loginRoute, loginHandler);
+authRouter.openapi(changePasswordRoute, changePasswordHandler);
 
 export default authRouter;
