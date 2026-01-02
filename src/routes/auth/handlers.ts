@@ -43,7 +43,10 @@ export const changePasswordHandler: RouteHandler<
     const { oldPassword, newPassword } = c.req.valid("json");
     const payload = c.get("jwtPayload");
 
-    const userId = payload.sub;
+    const userId = payload?.sub;
+    if (!userId) {
+        return c.json({ message: "Unauthorized" }, 401);
+    }
 
     const user = await db
         .select()
