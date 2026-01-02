@@ -17,7 +17,6 @@ export const loginRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
-                        success: z.boolean().default(true),
                         token: z.string().openapi({ example: "eyJhbGci..." }),
                     }),
                 },
@@ -46,7 +45,6 @@ export const changePasswordRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
-                        success: z.boolean().default(true),
                         message: z.string(),
                     }),
                 },

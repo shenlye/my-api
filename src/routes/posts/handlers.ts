@@ -24,7 +24,6 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
 
     return c.json(
         {
-            success: true,
             data: {
                 ...result[0],
                 createdAt: result[0].createdAt.toISOString(),
@@ -64,7 +63,6 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
 
     return c.json(
         {
-            success: true,
             data: data.map((item) => ({
                 ...item,
                 createdAt: item.createdAt.toISOString(),
@@ -126,7 +124,8 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
                 success: false,
                 error: {
                     code: "CONFLICT",
-                    message: "Slug already exists, please choose a different one",
+                    message:
+                        "Slug already exists, please choose a different one",
                 },
             },
             409,
@@ -140,7 +139,6 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
 
     return c.json(
         {
-            success: true,
             message: "Post created successfully",
             data: {
                 ...result[0],
