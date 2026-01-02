@@ -1,12 +1,14 @@
 import pino from "pino";
+import { env } from "./env";
+
+const isProduction = env.BUN_ENV === "production";
 
 export const logger = pino({
-    transport: {
-        target: "pino-pretty",
-        options: {
-            colorize: true,
-            translateTime: "SYS:standard",
-            ignore: "pid,hostname",
-        },
-    },
+    level: isProduction ? "info" : "debug",
+    transport: isProduction
+        ? undefined
+        : {
+              target: "pino-pretty",
+              options: { colorize: true },
+          },
 });
