@@ -14,17 +14,16 @@ export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
         .where(or(eq(users.username, identifier), eq(users.email, identifier)))
         .limit(1);
 
-    
     const foundUser = user[0];
 
-    const dummyHash = "$argon2id$v=19$m=65536,t=3,p=4$c29tZXNhbHQ$q/v5V4AmI3f23aVw7V7d2A";
+    const dummyHash =
+        "$argon2id$v=19$m=65536,t=3,p=4$c29tZXNhbHQ$q/v5V4AmI3f23aVw7V7d2A";
     const passwordHash = foundUser ? foundUser.passwordHash : dummyHash;
     const isMatch = await Bun.password.verify(passwordHash, password);
 
     if (!foundUser || !isMatch) {
         return c.json({ message: "Invalid username/email or password" }, 401);
     }
-
 
     const payload = {
         sub: user[0].id,
