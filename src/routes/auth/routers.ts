@@ -1,5 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { createErrorResponse } from "../../lib/route-factory";
+import { authMiddleware } from "../../middleware/auth";
 import { changePasswordSchema, loginSchema } from "./schema";
 
 export const loginRoute = createRoute({
@@ -32,6 +33,7 @@ export const loginRoute = createRoute({
 export const changePasswordRoute = createRoute({
     method: "post",
     path: "/change-password",
+    middleware: [authMiddleware] as const,
     security: [{ Bearer: [] }],
     request: {
         body: {
