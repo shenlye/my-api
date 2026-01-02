@@ -4,7 +4,9 @@ const envSchema = z.object({
     DATABASE_URL: z.url(),
     JWT_SECRET: z.string().min(16, "JWT_SECRET 必须至少 16 位以保证安全"),
     DEFAULT_ADMIN_PASSWORD: z.string().min(8),
-    NODE_ENV: z.enum(["development", "production", "test"]).default("production"),
+    NODE_ENV: z
+        .enum(["development", "production", "test"])
+        .default("production"),
 });
 
 const parsed = envSchema.safeParse(process.env);
