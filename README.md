@@ -84,7 +84,7 @@ docker run -d \
   --name blog-backend \
   -p 8088:3000 \
   -e DATABASE_URL="your_postgresql_url" \
-  -e JWT_SECRET="your_jwt_secret" \
+  -e JWT_SECRET="your_jwt_secret_key" \
   -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
   --restart always \
   ghcr.io/shenlye/my-api:latest
