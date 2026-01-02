@@ -40,7 +40,7 @@ export const loginRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
-                        error: z.string(),
+                        message: z.string(),
                     }),
                 },
             },

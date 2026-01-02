@@ -97,6 +97,9 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
             201,
         );
     } catch (e) {
+
+        // FIXME: Slug 冲突还是报错500，记得修一下
+
         const error = e as PostgresError;
 
         if (error.code === "23505") {
