@@ -30,6 +30,14 @@ export const seedDefaultUser = async () => {
                 })
                 .onConflictDoNothing();
 
+            logger.warn(`${"=".repeat(50)}`);
+            logger.warn("SECURITY NOTICE: Default admin created.");
+            logger.warn("Username: admin");
+            logger.warn(
+                "Password: [As defined in your DEFAULT_ADMIN_PASSWORD]",
+            );
+            logger.warn(`${"=".repeat(50)}\n`);
+
             logger.info(
                 {
                     user: {
@@ -40,14 +48,6 @@ export const seedDefaultUser = async () => {
                 },
                 "✅ Default admin account initialized successfully.",
             );
-
-            console.log(`\n${"=".repeat(50)}`);
-            console.log("SECURITY NOTICE: Default admin created.");
-            console.log("Username: admin");
-            console.log(
-                "Password: [As defined in your DEFAULT_ADMIN_PASSWORD]",
-            );
-            console.log(`${"=".repeat(50)}\n`);
         }
     } catch (error) {
         logger.error(error, "Failed to seed default user");
