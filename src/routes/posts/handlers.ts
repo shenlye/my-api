@@ -1,5 +1,5 @@
 import type { RouteHandler } from "@hono/zod-openapi";
-import { postService } from "../../services/posts";
+import { postService } from "../../index";
 import type { createPostRoute, getPostRoute, listPostsRoute } from "./routes";
 
 export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {

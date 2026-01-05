@@ -1,5 +1,5 @@
 import type { RouteHandler } from "@hono/zod-openapi";
-import { authService } from "../../services/auth";
+import { authService } from "../../index";
 import type { changePasswordRoute, loginRoute } from "./routers";
 
 export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
