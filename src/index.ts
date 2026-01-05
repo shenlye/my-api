@@ -111,3 +111,9 @@ export default {
     port,
     fetch: app.fetch,
 };
+
+const routes = app
+    .route("/api/v1/posts", postsRouter)
+    .route("/api/v1/auth", authRouter);
+
+export type AppType = typeof routes;
