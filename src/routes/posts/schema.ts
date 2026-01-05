@@ -63,15 +63,9 @@ export const paginationSchema = z.object({
         description: "页码，从 1 开始",
         type: "integer",
     }),
-    limit: z.coerce
-        .number()
-        .int()
-        .min(1)
-        .max(100)
-        .default(10)
-        .openapi({
-            example: 10,
-            description: "每页记录数，最大 100",
-            type: "integer",
-        }),
+    limit: z.coerce.number().int().min(1).max(100).default(10).openapi({
+        example: 10,
+        description: "每页记录数，最大 100",
+        type: "integer",
+    }),
 });
