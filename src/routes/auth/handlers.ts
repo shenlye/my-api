@@ -1,26 +1,16 @@
 import type { RouteHandler } from "@hono/zod-openapi";
-import { eq, or } from "drizzle-orm";
-import { sign } from "hono/jwt";
-import { db } from "../../db";
-import { users } from "../../db/schema";
-import { env } from "../../lib/env";
+import { authService } from "../../services/auth";
 import type { changePasswordRoute, loginRoute } from "./routers";
 
 export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
     const { identifier, password } = c.req.valid("json");
 
-    const user = await db
-        .select()
-        .from(users)
-        .where(or(eq(users.username, identifier), eq(users.email, identifier)))
-        .limit(1);
-
-    const foundUser = user[0];
+    const foundUser = await authService.findUserByIdentifier(identifier);
 
     const dummyHash =
         "$argon2id$v=19$m=65536,t=3,p=4$c29tZXNhbHQ$q/v5V4AmI3f23aVw7V7d2A";
     const passwordHash = foundUser ? foundUser.passwordHash : dummyHash;
-    const isMatch = await Bun.password.verify(password, passwordHash);
+    const isMatch = await authService.verifyPassword(password, passwordHash);
 
     if (!foundUser || !isMatch) {
         return c.json(
@@ -35,13 +25,10 @@ export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
         );
     }
 
-    const payload = {
-        sub: user[0].id,
-        role: user[0].role,
-        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
-    };
-
-    const token = await sign(payload, env.JWT_SECRET);
+    const token = await authService.generateToken({
+        id: foundUser.id,
+        role: foundUser.role,
+    });
 
     return c.json(
         {
@@ -72,13 +59,7 @@ export const changePasswordHandler: RouteHandler<
         );
     }
 
-    const user = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
-
-    const foundUser = user[0];
+    const foundUser = await authService.findUserById(Number(userId));
     if (!foundUser) {
         return c.json(
             {
@@ -105,7 +86,7 @@ export const changePasswordHandler: RouteHandler<
         );
     }
 
-    const isMatch = await Bun.password.verify(
+    const isMatch = await authService.verifyPassword(
         oldPassword,
         foundUser.passwordHash,
     );
@@ -123,15 +104,14 @@ export const changePasswordHandler: RouteHandler<
         );
     }
 
-    const newPasswordHash = await Bun.password.hash(newPassword);
+    const newPasswordHash = await authService.hashPassword(newPassword);
 
-    const result = await db
-        .update(users)
-        .set({ passwordHash: newPasswordHash })
-        .where(eq(users.id, userId))
-        .returning();
+    const success = await authService.updatePassword(
+        Number(userId),
+        newPasswordHash,
+    );
 
-    if (result.length === 0) {
+    if (!success) {
         return c.json(
             {
                 success: false,
