@@ -30,7 +30,7 @@ DEFAULT_ADMIN_PASSWORD=your_default_admin_password
 
 Description:
 - `DATABASE_URL`: SQLite database file path (e.g., `sqlite.db`)
-- `JWT_SECRET`: Secret key for generating and verifying JWT tokens
+- `JWT_SECRET`: Secret key for generating and verifying JWT tokens. In production, if this is not provided, a random secret will be automatically generated and persisted.
 - `DEFAULT_ADMIN_PASSWORD`: Password for the default admin account created on first run
 
 ### 3. Initialize Database
@@ -84,8 +84,9 @@ docker run -d \
   -p 8088:3000 \
   -v /opt/blog/data:/app/data \
   -e DATABASE_URL="/app/data/sqlite.db" \
-  -e JWT_SECRET="your_jwt_secret_key" \
   -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
   --restart always \
   ghcr.io/shenlye/my-api:latest
 ```
+
+> **Note**: `JWT_SECRET` is optional. If not provided, the system will automatically generate a random secret and save it in the mounted `/app/data/jwt_secret` file.
