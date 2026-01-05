@@ -1,4 +1,4 @@
-import { relations, sql } from "drizzle-orm";
+import { type InferSelectModel, relations, sql } from "drizzle-orm";
 import {
     index,
     integer,
@@ -58,6 +58,8 @@ export const posts = sqliteTable(
         index("category_id_idx").on(t.categoryId),
     ],
 );
+
+export type Post = InferSelectModel<typeof posts>;
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
     author: one(users, {

@@ -1,6 +1,7 @@
 import { count, eq } from "drizzle-orm";
 import type { DB } from "../db";
 import { posts } from "../db/schema";
+import type { PostDetail, PostListItem } from "../types/post";
 
 export class PostService {
     constructor(private db: DB) {}
@@ -85,17 +86,15 @@ export class PostService {
         return !!post;
     }
 
-    // biome-ignore lint/suspicious/noExplicitAny: 不会写
-    formatPost(post: any) {
+    formatPost(post: PostDetail | PostListItem) {
         return {
             id: post.id,
             title: post.title,
             slug: post.slug,
-            content: post.content,
+            content: "content" in post ? post.content : null,
             description: post.description,
             categories: post.category ? [post.category.name] : [],
-            // biome-ignore lint/suspicious/noExplicitAny: 不会写
-            tags: post.postsToTags?.map((pt: any) => pt.tag.name) || [],
+            tags: post.postsToTags?.map((pt) => pt.tag.name) || [],
             cover: post.cover,
             isPublished: post.isPublished,
             createdAt: post.createdAt.toISOString(),
