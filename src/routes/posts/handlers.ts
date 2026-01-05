@@ -1,23 +1,11 @@
 import type { RouteHandler } from "@hono/zod-openapi";
-import { count, eq } from "drizzle-orm";
-import { db } from "../../db";
-import { posts } from "../../db/schema";
+import { postService } from "../../services/posts";
 import type { createPostRoute, getPostRoute, listPostsRoute } from "./routes";
 
 export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
     const { slug } = c.req.valid("param");
 
-    const result = await db.query.posts.findFirst({
-        where: eq(posts.slug, slug),
-        with: {
-            category: true,
-            postsToTags: {
-                with: {
-                    tag: true,
-                },
-            },
-        },
-    });
+    const result = await postService.getPostBySlug(slug);
 
     if (!result) {
         return c.json(
@@ -35,13 +23,7 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
     return c.json(
         {
             success: true,
-            data: {
-                ...result,
-                categories: result.category ? [result.category.name] : [],
-                tags: result.postsToTags.map((pt) => pt.tag.name),
-                createdAt: result.createdAt.toISOString(),
-                updatedAt: result.updatedAt.toISOString(),
-            },
+            data: postService.formatPost(result),
         },
         200,
     );
@@ -54,40 +36,16 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
     const page = Math.max(1, Number(pageStr) || 1);
     const limit = Math.min(20, Math.max(1, Number(limitStr) || 10));
 
-    const [data, total] = await Promise.all([
-        db.query.posts.findMany({
-            limit: limit,
-            offset: (page - 1) * limit,
-            columns: {
-                content: false,
-            },
-            with: {
-                category: true,
-                postsToTags: {
-                    with: {
-                        tag: true,
-                    },
-                },
-            },
-            orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-        }),
-        db.select({ count: count() }).from(posts),
-    ]);
+    const { data, total } = await postService.listPosts(page, limit);
 
     return c.json(
         {
             success: true,
-            data: data.map((item) => ({
-                ...item,
-                categories: item.category ? [item.category.name] : [],
-                tags: item.postsToTags.map((pt) => pt.tag.name),
-                createdAt: item.createdAt.toISOString(),
-                updatedAt: item.updatedAt.toISOString(),
-            })),
+            data: data.map((item) => postService.formatPost(item)),
             meta: {
-                total: total[0].count,
-                page: page,
-                limit: limit,
+                total,
+                page,
+                limit,
             },
         },
         200,
@@ -117,11 +75,9 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         slug = `${datePrefix}-${randomPart}`;
     }
 
-    const existingPost = await db.query.posts.findFirst({
-        where: eq(posts.slug, slug),
-    });
+    const exists = await postService.existsBySlug(slug);
 
-    if (existingPost) {
+    if (exists) {
         return c.json(
             {
                 success: false,
@@ -150,30 +106,15 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         );
     }
 
-    const [newPost] = await db
-        .insert(posts)
-        .values({
-            title,
-            content,
-            slug,
-            description,
-            authorId: Number(authorId),
-            cover,
-            isPublished,
-            categoryId,
-        })
-        .returning();
-
-    const result = await db.query.posts.findFirst({
-        where: eq(posts.id, newPost.id),
-        with: {
-            category: true,
-            postsToTags: {
-                with: {
-                    tag: true,
-                },
-            },
-        },
+    const result = await postService.createPost({
+        title,
+        content,
+        slug,
+        description,
+        authorId: Number(authorId),
+        cover,
+        isPublished,
+        categoryId,
     });
 
     if (!result) {
@@ -189,26 +130,10 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         );
     }
 
-    const {
-        category,
-        postsToTags,
-        categoryId: _categoryId,
-        authorId: _authorId,
-        createdAt,
-        updatedAt,
-        ...cleanResult
-    } = result;
-
     return c.json(
         {
             success: true,
-            data: {
-                ...cleanResult,
-                categories: category ? [category.name] : [],
-                tags: postsToTags.map((pt) => pt.tag.name),
-                createdAt: createdAt.toISOString(),
-                updatedAt: updatedAt.toISOString(),
-            },
+            data: postService.formatPost(result),
         },
         201,
     );
