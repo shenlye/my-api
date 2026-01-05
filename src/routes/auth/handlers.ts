@@ -116,11 +116,11 @@ export const changePasswordHandler: RouteHandler<
             {
                 success: false,
                 error: {
-                    code: "NOT_FOUND",
-                    message: "User not found during update",
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Failed to update password",
                 },
             },
-            404,
+            500,
         );
     }
 

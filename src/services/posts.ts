@@ -42,7 +42,7 @@ export class PostService {
 
         return {
             data,
-            total: total[0].count,
+            total: Number(total[0].count),
         };
     }
 
@@ -56,10 +56,11 @@ export class PostService {
         isPublished: boolean;
         categoryId?: number | null;
     }) {
-        const [newPost] = await this.db
-            .insert(posts)
-            .values(values)
-            .returning();
+        const inserted = await this.db.insert(posts).values(values).returning();
+        const newPost = inserted[0];
+        if (!newPost) {
+            return null;
+        }
 
         return await this.db.query.posts.findFirst({
             where: eq(posts.id, newPost.id),
