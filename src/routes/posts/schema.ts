@@ -58,6 +58,20 @@ export const createPostSchema = z
     .openapi("CreatePost");
 
 export const paginationSchema = z.object({
-    page: z.string().optional().default("1").openapi({ example: "1" }),
-    limit: z.string().optional().default("10").openapi({ example: "10" }),
+    page: z.coerce.number().int().positive().default(1).openapi({
+        example: 1,
+        description: "页码，从 1 开始",
+        type: "integer",
+    }),
+    limit: z.coerce
+        .number()
+        .int()
+        .min(1)
+        .max(100)
+        .default(10)
+        .openapi({
+            example: 10,
+            description: "每页记录数，最大 100",
+            type: "integer",
+        }),
 });
