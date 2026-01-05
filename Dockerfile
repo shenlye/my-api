@@ -12,8 +12,9 @@ FROM base AS release
 COPY --from=install /app/node_modules ./node_modules
 COPY . .
 
+RUN mkdir -p /app/data
+
 # 暴露 Hono 默认端口
 EXPOSE 3000
 
-# 启动命令
-ENTRYPOINT ["bun", "run", "src/index.ts"]
+ENTRYPOINT ["sh", "-c", "bunx drizzle-kit push && bun run src/index.ts"]
