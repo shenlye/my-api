@@ -46,6 +46,14 @@ export const createPostSchema = z
             .string()
             .optional()
             .openapi({ example: "A short description of the post" }),
+        cover: z
+            .url()
+            .optional()
+            .openapi({ example: "https://example.com/cover.jpg" }),
+
+        isPublished: z.boolean().default(false).openapi({ example: true }),
+
+        categoryId: z.number().int().optional().openapi({ example: 1 }),
     })
     .openapi("CreatePost");
 
