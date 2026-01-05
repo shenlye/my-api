@@ -2,7 +2,8 @@
     "name": "my-api",
     "scripts": {
         "dev": "bun run --hot src/index.ts",
-        "check": "biome check --write ."
+        "check": "biome check --write .",
+        "generate": "drizzle-kit generate"
     },
     "dependencies": {
         "@hono/zod-openapi": "^1.2.0",

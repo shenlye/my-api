@@ -1,4 +1,4 @@
-import { count, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import type { DB } from "../db";
 import { posts } from "../db/schema";
 
@@ -7,7 +7,7 @@ export class PostService {
 
     async getPostBySlug(slug: string) {
         return await this.db.query.posts.findFirst({
-            where: eq(posts.slug, slug),
+            where: and(eq(posts.slug, slug), eq(posts.isPublished, true)),
             with: {
                 category: true,
                 postsToTags: {
@@ -22,6 +22,7 @@ export class PostService {
     async listPosts(page: number, limit: number) {
         const [data, total] = await Promise.all([
             this.db.query.posts.findMany({
+                where: eq(posts.isPublished, true),
                 limit: limit,
                 offset: (page - 1) * limit,
                 columns: {
@@ -37,7 +38,10 @@ export class PostService {
                 },
                 orderBy: (posts, { desc }) => [desc(posts.createdAt)],
             }),
-            this.db.select({ count: count() }).from(posts),
+            this.db
+                .select({ count: count() })
+                .from(posts)
+                .where(eq(posts.isPublished, true)),
         ]);
 
         return {
