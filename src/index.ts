@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger as honoLogger } from "hono/logger";
 import { seedDefaultUser } from "./db";
@@ -62,6 +63,21 @@ app.use(
     honoLogger((str) => logger.info(str)),
 );
 
+app.use(
+    "*",
+    cors({
+        origin: ["https://blog.shenley.cn", "http://localhost:5173"],
+
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+
+        allowHeaders: ["Content-Type", "Authorization"],
+
+        credentials: true,
+
+        maxAge: 600,
+    }),
+);
+
 // 初始化默认管理员用户
 await seedDefaultUser();
 
@@ -83,4 +99,14 @@ app.get("/docs", Scalar({ url: "/api/v1/openapi.json" }));
 app.route("/api/v1/posts", postsRouter);
 app.route("/api/v1/auth", authRouter);
 
-export default app;
+app.get("/health", (c) => {
+    return c.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+const port = Number(process.env.PORT) || 3000;
+logger.info(`Server starting on port ${port}...`);
+
+export default {
+    port,
+    fetch: app.fetch,
+};

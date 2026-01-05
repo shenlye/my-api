@@ -56,6 +56,7 @@ export const posts = sqliteTable(
     (t) => [
         index("created_at_idx").on(t.createdAt),
         index("category_id_idx").on(t.categoryId),
+        index("is_published_idx").on(t.isPublished),
     ],
 );
 

@@ -8,6 +8,7 @@ const envSchema = z.object({
     NODE_ENV: z
         .enum(["development", "production", "test"])
         .default("production"),
+    PORT: z.coerce.number().int().positive().default(3000),
 });
 
 const parsed = envSchema.safeParse(process.env);
