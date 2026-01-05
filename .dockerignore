@@ -5,3 +5,7 @@ test
 README.md
 docker-compose.yml
 Dockerfile
+.vscode
+dist
+drizzle
+sqlite*
