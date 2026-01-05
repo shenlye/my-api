@@ -8,6 +8,7 @@ import { users } from "./schema";
 
 const sqlite = new Database(env.DATABASE_URL);
 export const db = drizzle(sqlite, { schema });
+export type DB = typeof db;
 
 export const seedDefaultUser = async () => {
     try {

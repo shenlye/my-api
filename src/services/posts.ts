@@ -1,27 +1,12 @@
 import { count, eq } from "drizzle-orm";
-import { db } from "../db";
+import type { DB } from "../db";
 import { posts } from "../db/schema";
 
-type PostWithRelations = NonNullable<
-    Awaited<
-        ReturnType<
-            typeof db.query.posts.findFirst<{
-                with: {
-                    category: true;
-                    postsToTags: {
-                        with: {
-                            tag: true;
-                        };
-                    };
-                };
-            }>
-        >
-    >
->;
+export class PostService {
+    constructor(private db: DB) {}
 
-export const postService = {
     async getPostBySlug(slug: string) {
-        return await db.query.posts.findFirst({
+        return await this.db.query.posts.findFirst({
             where: eq(posts.slug, slug),
             with: {
                 category: true,
@@ -32,11 +17,11 @@ export const postService = {
                 },
             },
         });
-    },
+    }
 
     async listPosts(page: number, limit: number) {
         const [data, total] = await Promise.all([
-            db.query.posts.findMany({
+            this.db.query.posts.findMany({
                 limit: limit,
                 offset: (page - 1) * limit,
                 columns: {
@@ -52,14 +37,14 @@ export const postService = {
                 },
                 orderBy: (posts, { desc }) => [desc(posts.createdAt)],
             }),
-            db.select({ count: count() }).from(posts),
+            this.db.select({ count: count() }).from(posts),
         ]);
 
         return {
             data,
             total: total[0].count,
         };
-    },
+    }
 
     async createPost(values: {
         title?: string | null;
@@ -71,9 +56,12 @@ export const postService = {
         isPublished: boolean;
         categoryId?: number | null;
     }) {
-        const [newPost] = await db.insert(posts).values(values).returning();
+        const [newPost] = await this.db
+            .insert(posts)
+            .values(values)
+            .returning();
 
-        return await db.query.posts.findFirst({
+        return await this.db.query.posts.findFirst({
             where: eq(posts.id, newPost.id),
             with: {
                 category: true,
@@ -84,35 +72,33 @@ export const postService = {
                 },
             },
         });
-    },
+    }
 
     async existsBySlug(slug: string) {
-        const post = await db.query.posts.findFirst({
+        const post = await this.db.query.posts.findFirst({
             where: eq(posts.slug, slug),
             columns: {
                 id: true,
             },
         });
         return !!post;
-    },
+    }
 
-    formatPost(post: PostWithRelations | Omit<PostWithRelations, "content">) {
-        const {
-            category,
-            postsToTags,
-            categoryId: _categoryId,
-            authorId: _authorId,
-            createdAt,
-            updatedAt,
-            ...cleanResult
-        } = post as PostWithRelations;
-
+    // biome-ignore lint/suspicious/noExplicitAny: 不会写
+    formatPost(post: any) {
         return {
-            ...cleanResult,
-            categories: category ? [category.name] : [],
-            tags: postsToTags.map((pt) => pt.tag.name),
-            createdAt: createdAt.toISOString(),
-            updatedAt: updatedAt.toISOString(),
+            id: post.id,
+            title: post.title,
+            slug: post.slug,
+            content: post.content,
+            description: post.description,
+            categories: post.category ? [post.category.name] : [],
+            // biome-ignore lint/suspicious/noExplicitAny: 不会写
+            tags: post.postsToTags?.map((pt: any) => pt.tag.name) || [],
+            cover: post.cover,
+            isPublished: post.isPublished,
+            createdAt: post.createdAt.toISOString(),
+            updatedAt: post.updatedAt.toISOString(),
         };
-    },
-};
+    }
+}
