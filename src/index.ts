@@ -4,11 +4,12 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger as honoLogger } from "hono/logger";
 import { seedDefaultUser } from "./db";
+import { env } from "./lib/env";
 import { logger } from "./lib/logger";
 import authRouter from "./routes/auth/index";
 import postsRouter from "./routes/posts/index";
 
-const app = new OpenAPIHono({
+export const app = new OpenAPIHono({
     // 当 JSON 格式正确，但不符合 Zod schema 时触发
     defaultHook: (result, c) => {
         if (!result.success) {
@@ -103,7 +104,7 @@ app.get("/health", (c) => {
     return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-const port = Number(process.env.PORT) || 3000;
+const port = env.PORT;
 logger.info(`Server starting on port ${port}...`);
 
 export default {

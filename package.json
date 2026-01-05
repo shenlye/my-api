@@ -1,6 +1,7 @@
 {
     "name": "my-api",
     "scripts": {
+        "start": "bun run src/index.ts",
         "dev": "bun run --hot src/index.ts",
         "check": "biome check --write .",
         "generate": "drizzle-kit generate"
