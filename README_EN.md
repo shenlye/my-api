@@ -56,7 +56,7 @@ Create a `docker-compose.yml` file:
 ```yaml
 services:
   blog-api:
-    image: ghcr.io/shenlye/my-api:latest
+    image: ghcr.io/shenlye/my-api-backend:latest
     container_name: blog-backend
     ports:
       - "8088:3000"
@@ -82,11 +82,11 @@ If you don't want to use docker-compose, you can run the following command direc
 docker run -d \
   --name blog-backend \
   -p 8088:3000 \
-  -v /opt/blog/data:/app/data \
+  -v /opt/blog-backend/data:/app/data \
   -e DATABASE_URL="/app/data/sqlite.db" \
   -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
   --restart always \
-  ghcr.io/shenlye/my-api:latest
+  ghcr.io/shenlye/my-api-backend:latest
 ```
 
 > **Note**: `JWT_SECRET` is optional. If not provided, the system will automatically generate a random secret and save it in the mounted `/app/data/jwt_secret` file.

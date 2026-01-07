@@ -29,13 +29,14 @@ bun install
 DATABASE_URL=your_database_url
 JWT_SECRET=your_jwt_secret_key
 DEFAULT_ADMIN_PASSWORD=your_default_admin_password
+ALLOWED_ORIGINS=http://localhost:5173
 ```
 
 说明：
 - `DATABASE_URL`: SQLite 数据库文件路径 (例如 `sqlite.db`)
 - `JWT_SECRET`: 用于生成和验证 JWT Token 的密钥。在生产环境下，如果不配置此项，系统将自动生成一个随机密钥并持久化保存。
 - `DEFAULT_ADMIN_PASSWORD`: 首次启动时自动创建的管理员账号 (admin) 的密码
-
+- `ALLOWED_ORIGINS`: 前端域名
 ### 3. 初始化数据库
 
 ```bash
@@ -59,7 +60,7 @@ bun run dev
 ```yaml
 services:
   blog-api:
-    image: ghcr.io/shenlye/my-api:latest
+    image: ghcr.io/shenlye/my-api-backend:latest
     container_name: blog-backend
     ports:
       - "8088:3000"
@@ -85,11 +86,11 @@ docker compose up -d
 docker run -d \
   --name blog-backend \
   -p 8088:3000 \
-  -v /opt/blog/data:/app/data \
+  -v /opt/blog-backend/data:/app/data \
   -e DATABASE_URL="/app/data/sqlite.db" \
   -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
   --restart always \
-  ghcr.io/shenlye/my-api:latest
+  ghcr.io/shenlye/my-api-backend:latest
 ```
 
 > **提示**: `JWT_SECRET` 是可选的。如果不提供，系统会自动生成一个随机密钥并保存在挂载的 `/app/data/jwt_secret` 文件中。
