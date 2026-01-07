@@ -60,4 +60,4 @@ class TagService {
     }
 }
 
-export type { TagService };
+export { TagService };

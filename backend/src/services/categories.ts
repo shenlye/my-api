@@ -29,4 +29,4 @@ class CategoryService {
     }
 }
 
-export type { CategoryService };
+export { CategoryService };
