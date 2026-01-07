@@ -11,9 +11,7 @@ const envSchema = z.object({
     PORT: z.coerce.number().int().positive().default(3000),
     ALLOWED_ORIGINS: z
         .string()
-        .default(
-            "http://localhost:5173,http://127.0.0.1:5173",
-        ),
+        .default("http://localhost:5173,http://127.0.0.1:5173"),
 });
 
 const parsed = envSchema.safeParse(process.env);
