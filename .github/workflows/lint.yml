@@ -32,6 +32,14 @@ jobs:
       - name: Type Check
         run: bunx tsc --noEmit
 
+      - name: Run Tests
+        env:
+          DATABASE_URL: "test.db"
+          DEFAULT_ADMIN_PASSWORD: "admin123456"
+        run: |
+          bunx drizzle-kit push
+          bun test
+
   frontend:
     runs-on: ubuntu-latest
     defaults:
