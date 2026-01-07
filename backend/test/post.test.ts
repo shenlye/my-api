@@ -12,7 +12,7 @@ import { PostSchema } from "../src/routes/posts/schema";
 describe("Posts CRUD tests", () => {
     let adminToken: string;
     let testPostId: number;
-    const testPostSlug = `test-post-${crypto.randomUUID().slice(0, 8)}`;
+    const testPostSlug = `test-post-${Bun.randomUUID().slice(0, 8)}`;
 
     beforeAll(async () => {
         // Ensure admin user exists with a known password
