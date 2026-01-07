@@ -1,8 +1,8 @@
-# My Simple Blog Backend
+# My Simple Blog Admin
 
 English version: [README_EN.md](README_EN.md)
 
-基于 Bun + Hono 的博客后端 API。
+基于 Bun + Hono 的博客后台。
 
 ## 技术栈
 
@@ -11,7 +11,7 @@ English version: [README_EN.md](README_EN.md)
 - Drizzle ORM - 数据库 ORM
 - Biome - 代码格式化和检查
 - SQLite - 数据库 (使用 Bun 内置驱动)
-- pino - 日志
+- Pino - 日志
 
 ## 本地开发
 
@@ -21,23 +21,7 @@ English version: [README_EN.md](README_EN.md)
 bun install
 ```
 
-### 2. 配置环境变量
-
-在项目根目录创建 `.env` 文件：
-
-```env
-DATABASE_URL=your_database_url
-JWT_SECRET=your_jwt_secret_key
-DEFAULT_ADMIN_PASSWORD=your_default_admin_password
-ALLOWED_ORIGINS=http://localhost:5173
-```
-
-说明：
-- `DATABASE_URL`: SQLite 数据库文件路径 (例如 `sqlite.db`)
-- `JWT_SECRET`: 用于生成和验证 JWT Token 的密钥。在生产环境下，如果不配置此项，系统将自动生成一个随机密钥并持久化保存。
-- `DEFAULT_ADMIN_PASSWORD`: 首次启动时自动创建的管理员账号 (admin) 的密码
-- `ALLOWED_ORIGINS`: 前端域名
-### 3. 初始化数据库
+### 2. 初始化数据库
 
 ```bash
 bunx drizzle-kit push
@@ -45,7 +29,7 @@ bunx drizzle-kit push
 
 这会根据 schema 创建数据库表结构。
 
-### 4. 启动开发服务器
+### 3. 启动开发服务器
 
 ```bash
 bun run dev
@@ -53,44 +37,29 @@ bun run dev
 
 服务默认运行在 http://localhost:3000
 
-## Docker 部署
-
-创建 `docker-compose.yml` 文件：
-
-```yaml
-services:
-  blog-api:
-    image: ghcr.io/shenlye/my-api-backend:latest
-    container_name: blog-backend
-    ports:
-      - "8088:3000"
-    volumes:
-      - /opt/blog/data:/app/data
-    env_file:
-      - .env
-    restart: always
-```
-
-启动服务：
-
-```bash
-docker compose pull
-docker compose up -d
-```
-
-### 直接使用 Docker Run 运行
-
-如果你不想使用 docker-compose，也可以直接运行以下命令：
+## Docker Run 运行
 
 ```bash
 docker run -d \
-  --name blog-backend \
+  --name blog-admin \
   -p 8088:3000 \
   -v /opt/blog-backend/data:/app/data \
-  -e DATABASE_URL="/app/data/sqlite.db" \
-  -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
   --restart always \
-  ghcr.io/shenlye/my-api-backend:latest
+  ghcr.io/shenlye/my-api:latest
 ```
 
-> **提示**: `JWT_SECRET` 是可选的。如果不提供，系统会自动生成一个随机密钥并保存在挂载的 `/app/data/jwt_secret` 文件中。
+### 环境变量
+
+```env
+DATABASE_URL=your_database_url
+JWT_SECRET=your_jwt_secret_key
+DEFAULT_ADMIN_PASSWORD=your_default_admin_password
+ALLOWED_ORIGINS=http://localhost:5173
+PORT=3000
+```
+
+说明：
+- `DATABASE_URL`: SQLite 数据库文件路径，默认为/app/data/sqlite.db
+- `JWT_SECRET`: 用于生成和验证 JWT Token 的密钥。在生产环境下，如果不配置此项，系统将自动生成一个随机密钥并持久化保存。
+- `DEFAULT_ADMIN_PASSWORD`: 首次启动时自动创建的管理员账号 (admin) 的密码，默认为admin123456
+- `ALLOWED_ORIGINS`: 前端域名
