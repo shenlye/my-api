@@ -5,7 +5,7 @@ const strongPassword = z
     .min(8, "密码长度至少为 8 位")
     .max(72, "密码长度不能超过 72 位")
     .regex(/[a-z]/, "必须包含至少一个小写字母")
-    .regex(/[0-9]/, "必须包含至少一个数字")
+    .regex(/[0-9]/, "必须包含至少一个数字");
 
 export const loginSchema = z.object({
     identifier: z.string().min(3).openapi({
