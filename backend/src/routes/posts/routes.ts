@@ -5,7 +5,12 @@ import {
     createSuccessSchema,
 } from "../../lib/schema";
 import { adminMiddleware, authMiddleware } from "../../middleware/auth";
-import { createPostSchema, PostSchema, paginationSchema } from "./schema";
+import {
+    createPostSchema,
+    PostSchema,
+    paginationSchema,
+    updatePostSchema,
+} from "./schema";
 
 export const getPostRoute = createRoute({
     method: "get",
@@ -77,6 +82,66 @@ export const createPostRoute = createRoute({
         401: createErrorResponse("Unauthorized"),
         403: createErrorResponse("Forbidden"),
         409: createErrorResponse("Conflict - Slug already exists"),
+        500: createErrorResponse("Internal Server Error"),
+    },
+});
+
+export const updatePostRoute = createRoute({
+    method: "patch",
+    path: "/{id}",
+    middleware: [authMiddleware, adminMiddleware] as const,
+    security: [{ Bearer: [] }],
+    request: {
+        params: z.object({
+            id: z.coerce.number().openapi({ example: 1 }),
+        }),
+        body: {
+            content: {
+                "application/json": {
+                    schema: updatePostSchema,
+                },
+            },
+        },
+    },
+    responses: {
+        200: {
+            content: {
+                "application/json": {
+                    schema: createSuccessSchema(PostSchema),
+                },
+            },
+            description: "Post updated successfully",
+        },
+        400: createErrorResponse("Invalid request data"),
+        401: createErrorResponse("Unauthorized"),
+        404: createErrorResponse("Post not found"),
+        409: createErrorResponse("Conflict - Slug already exists"),
+        500: createErrorResponse("Internal Server Error"),
+    },
+});
+
+export const deletePostRoute = createRoute({
+    method: "delete",
+    path: "/{id}",
+    middleware: [authMiddleware, adminMiddleware] as const,
+    security: [{ Bearer: [] }],
+    request: {
+        params: z.object({
+            id: z.coerce.number().openapi({ example: 1 }),
+        }),
+    },
+    responses: {
+        200: {
+            content: {
+                "application/json": {
+                    schema: createSuccessSchema(z.object({ id: z.number() })),
+                },
+            },
+            description: "Post deleted successfully",
+        },
+        401: createErrorResponse("Unauthorized"),
+        403: createErrorResponse("Forbidden"),
+        404: createErrorResponse("Post not found"),
         500: createErrorResponse("Internal Server Error"),
     },
 });

@@ -53,9 +53,17 @@ export const createPostSchema = z
 
         isPublished: z.boolean().default(false).openapi({ example: true }),
 
-        categoryId: z.number().int().optional().openapi({ example: 1 }),
+        category: z.string().optional().openapi({ example: "Tech" }),
+        tags: z
+            .array(z.string())
+            .optional()
+            .openapi({ example: ["Hono", "Zod"] }),
     })
     .openapi("CreatePost");
+
+export const updatePostSchema = createPostSchema
+    .partial()
+    .openapi("UpdatePost");
 
 export const paginationSchema = z.object({
     page: z.coerce.number().int().positive().default(1).openapi({
