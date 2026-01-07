@@ -1,6 +1,8 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { db } from "../../db";
+import { CategoryService } from "../../services/categories";
 import { PostService } from "../../services/posts";
+import { TagService } from "../../services/tags";
 import type {
     createPostRoute,
     deletePostRoute,
@@ -9,7 +11,9 @@ import type {
     updatePostRoute,
 } from "./routes";
 
-export const postService = new PostService(db);
+const categoryService = new CategoryService(db);
+const tagService = new TagService(db);
+export const postService = new PostService(db, categoryService, tagService);
 export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
     const { slug } = c.req.valid("param");
 
