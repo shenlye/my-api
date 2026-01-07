@@ -7,6 +7,7 @@ import * as schema from "./schema";
 import { users } from "./schema";
 
 const sqlite = new Database(env.DATABASE_URL);
+sqlite.run("PRAGMA journal_mode = WAL;");
 export const db = drizzle(sqlite, { schema });
 export type DB = typeof db;
 
