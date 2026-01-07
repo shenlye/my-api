@@ -1,4 +1,5 @@
 import type { RouteHandler } from "@hono/zod-openapi";
+import { pinyin } from "pinyin-pro";
 import { db } from "../../db";
 import { CategoryService } from "../../services/categories";
 import { PostService } from "../../services/posts";
@@ -79,13 +80,24 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
     } = c.req.valid("json");
     let slug = providedSlug;
     if (!slug) {
-        const datePrefix = new Date().toISOString().split("T")[0]; // 2026-01-05
+        if (title) {
+            const pinyinText = pinyin(title, {
+                toneType: "none",
+                type: "array",
+            }).join("-");
 
-        // Math.random() is not suitable for generating unique identifiers
-        const randomPart = Buffer.from(
-            crypto.getRandomValues(new Uint8Array(4)),
-        ).toString("hex");
-        slug = `${datePrefix}-${randomPart}`;
+            slug = pinyinText
+                .toLowerCase()
+                .replace(/[^\w-]+/g, "")
+                .replace(/--+/g, "-")
+                .replace(/^-+|-+$/g, "");
+        } else {
+            const datePrefix = new Date().toISOString().split("T")[0];
+
+            const randomPart = Bun.randomUUIDv7().slice(0, 6);
+
+            slug = `${datePrefix}-${randomPart}`;
+        }
     }
 
     const exists = await postService.existsBySlug(slug);
