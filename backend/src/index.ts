@@ -1,6 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
-
+import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger as honoLogger } from "hono/logger";
@@ -106,6 +106,15 @@ app.get("/docs", Scalar({ url: "/api/v1/openapi.json" }));
 
 app.get("/health", (c) => {
     return c.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+app.use("/*", serveStatic({ root: "./public" }));
+app.get("*", async (c) => {
+    const file = Bun.file("./public/index.html");
+    if (await file.exists()) {
+        return c.html(await file.text());
+    }
+    return c.text("Not Found", 404);
 });
 
 const port = env.PORT;
