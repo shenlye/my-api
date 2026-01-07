@@ -9,6 +9,11 @@ const envSchema = z.object({
         .enum(["development", "production", "test"])
         .default("production"),
     PORT: z.coerce.number().int().positive().default(3000),
+    ALLOWED_ORIGINS: z
+        .string()
+        .default(
+            "https://blog.shenley.cn,http://localhost:5173,http://127.0.0.1:5173",
+        ),
 });
 
 const parsed = envSchema.safeParse(process.env);

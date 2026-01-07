@@ -37,11 +37,7 @@ app.use(
 app.use(
     "*",
     cors({
-        origin: [
-            "https://blog.shenley.cn",
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
-        ],
+        origin: env.ALLOWED_ORIGINS.split(","),
 
         allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 
