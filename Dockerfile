@@ -22,10 +22,12 @@ RUN bun run build
 FROM oven/bun:latest AS runner
 WORKDIR /app
 
-COPY --from=base /app/node_modules ./node_modules
+COPY package.json bun.lock ./
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
+RUN bun install --frozen-lockfile --production
 
 COPY backend/src ./backend/src
-COPY backend/package.json ./backend/
 COPY backend/drizzle.config.ts ./backend/
 COPY backend/tsconfig*.json ./backend/
 

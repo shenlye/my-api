@@ -27,10 +27,10 @@ const env = parsed.data;
 
 if (env.NODE_ENV === "production") {
     if (env.DEFAULT_ADMIN_PASSWORD === "admin123456") {
-        console.warn("\n" + "=".repeat(50));
+        console.warn(`\n${"=".repeat(50)}`);
         console.warn("SECURITY WARNING: Using default admin password.");
         console.warn("请务必在首次登录后通过个人设置修改密码！");
-        console.warn("=".repeat(50) + "\n");
+        console.warn(`${"=".repeat(50)}\n`);
     }
 
     if (env.JWT_SECRET === "your_jwt_secret_key") {
@@ -38,25 +38,22 @@ if (env.NODE_ENV === "production") {
         try {
             await mkdir("/app/data", { recursive: true });
             const file = Bun.file(secretPath);
-            let finalSecret = "";
 
-            if (await file.exists()) {
-                const content = (await file.text()).trim();
-                if (content && content.length >= 32) {
-                    finalSecret = content;
-                    console.info(`从 ${secretPath} 加载了持久化 JWT_SECRET`);
-                }
-            }
+            let finalSecret = (await file.text()).trim();
 
-            if (!finalSecret) {
+            if (finalSecret && finalSecret.length >= 32) {
+                console.info(`从 ${secretPath} 加载了持久化 JWT_SECRET`);
+            } else {
                 finalSecret = crypto.randomUUID();
                 await Bun.write(secretPath, finalSecret);
-                console.info(`🆕 已生成新的随机 JWT_SECRET 并保存至 ${secretPath}`);
+                console.info(
+                    `已生成新的随机 JWT_SECRET 并保存至 ${secretPath}`,
+                );
             }
 
             env.JWT_SECRET = finalSecret;
         } catch (error) {
-            console.error(`❌ 生产环境自动生成密钥失败 (${secretPath}):`, error);
+            console.error(`生产环境自动生成密钥失败 (${secretPath}):`, error);
             process.exit(1);
         }
     }
