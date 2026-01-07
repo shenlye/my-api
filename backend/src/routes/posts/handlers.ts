@@ -1,7 +1,13 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { db } from "../../db";
 import { PostService } from "../../services/posts";
-import type { createPostRoute, getPostRoute, listPostsRoute } from "./routes";
+import type {
+    createPostRoute,
+    deletePostRoute,
+    getPostRoute,
+    listPostsRoute,
+    updatePostRoute,
+} from "./routes";
 
 export const postService = new PostService(db);
 export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
@@ -64,7 +70,8 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         description,
         cover,
         isPublished,
-        categoryId,
+        category,
+        tags,
     } = c.req.valid("json");
     let slug = providedSlug;
     if (!slug) {
@@ -119,7 +126,8 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
             authorId: Number(authorId),
             cover,
             isPublished,
-            categoryId,
+            category,
+            tags,
         });
     } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
@@ -158,5 +166,83 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
             data: postService.formatPost(result),
         },
         201,
+    );
+};
+
+export const updatePostHandler: RouteHandler<typeof updatePostRoute> = async (
+    c,
+) => {
+    const { id } = c.req.valid("param");
+    const values = c.req.valid("json");
+
+    let result: any;
+    try {
+        result = await postService.updatePost(id, values);
+    } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        if (message.includes("UNIQUE") && message.includes("posts.slug")) {
+            return c.json(
+                {
+                    success: false,
+                    error: {
+                        code: "CONFLICT",
+                        message:
+                            "Slug already exists, please choose a different one",
+                    },
+                },
+                409,
+            );
+        }
+        throw e;
+    }
+
+    if (!result) {
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "NOT_FOUND",
+                    message: "Post not found",
+                },
+            },
+            404,
+        );
+    }
+
+    return c.json(
+        {
+            success: true,
+            data: postService.formatPost(result),
+        },
+        200,
+    );
+};
+
+export const deletePostHandler: RouteHandler<typeof deletePostRoute> = async (
+    c,
+) => {
+    const { id } = c.req.valid("param");
+
+    const result = await postService.deletePost(id);
+
+    if (result.length === 0) {
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "NOT_FOUND",
+                    message: "Post not found",
+                },
+            },
+            404,
+        );
+    }
+
+    return c.json(
+        {
+            success: true,
+            data: { id },
+        },
+        200,
     );
 };
