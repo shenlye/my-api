@@ -1,14 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { client } from "@/lib/api";
+import { parseBackendError } from "@/lib/utils";
 export default function App() {
 	const [identifier, setIdentifier] = useState("");
 	const [password, setPassword] = useState("");
-
+	const navigate = useNavigate();
 	const loginMutation = useMutation({
 		mutationFn: async () => {
 			const res = await client.api.v1.auth.login.$post({
@@ -18,27 +21,20 @@ export default function App() {
 				},
 			});
 
-			const result = await res.json();
-
-			if (!res.ok) {
-				const message =
-					"error" in result ? result.error.message : "Login failed";
-				throw new Error(message);
+			const result = await res.json().catch(() => null);
+			if (!res.ok || !result || "error" in result) {
+				throw new Error(parseBackendError(result));
 			}
 
-			if ("data" in result) {
-				return result;
-			}
-
-			throw new Error("Invalid response");
+			return result;
 		},
 		onSuccess: (data) => {
 			localStorage.setItem("token", data.data.token);
-			alert("Login successful!");
-			// Redirect or update state here
+			toast.success("Login successful!");
+			navigate("/");
 		},
 		onError: (error: Error) => {
-			alert(error.message);
+			toast.error(error.message);
 		},
 	});
 

@@ -7,26 +7,12 @@ import { logger as honoLogger } from "hono/logger";
 import { seedDefaultUser } from "./db";
 import { env } from "./lib/env";
 import { logger } from "./lib/logger";
+import { defaultHook } from "./lib/route-factory";
 import authRouter from "./routes/auth/index";
 import postsRouter from "./routes/posts/index";
 
 const app = new OpenAPIHono({
-    // 当 JSON 格式正确，但不符合 Zod schema 时触发
-    defaultHook: (result, c) => {
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    error: {
-                        code: "VALIDATION_ERROR",
-                        message: "Validation Error",
-                        details: result.error.issues,
-                    },
-                },
-                400,
-            );
-        }
-    },
+    defaultHook,
 });
 
 app.use(

@@ -1,9 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { rateLimiter } from "hono-rate-limiter";
+import { defaultHook } from "../../lib/route-factory";
 import { changePasswordHandler, loginHandler } from "./handlers";
 import { changePasswordRoute, loginRoute } from "./routers";
 
-const authRouter = new OpenAPIHono();
+const authRouter = new OpenAPIHono({ defaultHook });
 
 authRouter.use(
     "*",

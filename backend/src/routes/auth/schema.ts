@@ -8,11 +8,11 @@ const strongPassword = z
     .regex(/[0-9]/, "必须包含至少一个数字");
 
 export const loginSchema = z.object({
-    identifier: z.string().min(3).openapi({
+    identifier: z.string().min(3, "用户名至少需要 3 个字符").openapi({
         example: "admin@example.com",
         description: "Username or email of the user",
     }),
-    password: z.string().min(6).openapi({
+    password: z.string().min(6, "密码长度至少为 6 位").openapi({
         example: "admin123",
         description: "Password of the user",
         format: "password",
