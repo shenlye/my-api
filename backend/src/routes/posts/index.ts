@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { defaultHook } from "../../lib/route-factory";
 import {
     createPostHandler,
     deletePostHandler,
@@ -14,7 +15,7 @@ import {
     updatePostRoute,
 } from "./routes";
 
-const postsRouter = new OpenAPIHono()
+const postsRouter = new OpenAPIHono({ defaultHook })
     .openapi(getPostRoute, getPostHandler)
     .openapi(listPostsRoute, listPostsHandler)
     .openapi(createPostRoute, createPostHandler)
