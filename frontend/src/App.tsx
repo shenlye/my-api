@@ -5,13 +5,11 @@ import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
-	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { client } from "@/lib/api";
-
 export default function App() {
 	const [identifier, setIdentifier] = useState("");
 	const [password, setPassword] = useState("");
@@ -55,26 +53,49 @@ export default function App() {
 	};
 
 	return (
-		<main className="grid min-h-svh lg:grid-cols-2">
-			<div className="relative hidden lg:block">
-				<div className="absolute inset-0 flex items-center justify-center text-background p-10">
-					<div className="space-y-2">
-						<h1 className="text-4xl font-bold">Welcome Back</h1>
-						<p className="text-lg opacity-80">
-							Login to manage your API and content.
-						</p>
+		<main className="flex min-h-svh items-center justify-center bg-muted/20">
+			<div className="w-full max-w-6xl flex bg-card shadow-2xl overflow-hidden border transition-all">
+				<div className="hidden md:block flex-1 min-w-0">
+					<div className="w-full h-full bg-primary overflow-hidden flex items-end justify-center relative">
+						<svg
+							viewBox="0 0 1000 300"
+							className="w-full h-auto fill-black opacity-80"
+							preserveAspectRatio="xMidYMax slice"
+							aria-hidden="true"
+						>
+							<g opacity="0.2">
+								<rect x="50" y="150" width="80" height="150" />
+								<rect x="250" y="100" width="100" height="200" />
+								<rect x="550" y="130" width="70" height="170" />
+								<rect x="800" y="160" width="90" height="140" />
+							</g>
+
+							<g opacity="0.5">
+								<rect x="150" y="200" width="100" height="100" />
+								<rect x="400" y="150" width="80" height="150" />
+								<rect x="650" y="180" width="120" height="120" />
+							</g>
+
+							<g>
+								<rect x="0" y="250" width="120" height="50" />
+								<rect x="200" y="50" width="60" height="250" />
+								<rect x="450" y="120" width="100" height="180" />
+								<rect x="750" y="150" width="80" height="150" />
+								<rect x="900" y="220" width="100" height="80" />
+							</g>
+						</svg>
+
+						<div className="absolute top-8 left-2 flex flex-col items-center justify-center pointer-events-none px-8 text-center text-primary-foreground">
+							<h2 className="text-4xl font-bold opacity-95">Welcome Back</h2>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="flex flex-col gap-4 p-6 md:p-10">
-				<div className="flex flex-1 items-center justify-center">
+
+				<div className="w-full md:w-md shrink flex items-center justify-center">
 					<div className="w-full max-w-sm">
-						<Card className="border-none shadow-none bg-background">
-							<CardHeader className="px-0">
-								<CardTitle className="text-2xl">Login</CardTitle>
-								<CardDescription>
-									Enter your email below to login to your account
-								</CardDescription>
+						<Card className="border-none shadow-none bg-transparent">
+							<CardHeader className="px-0 pt-0">
+								<CardTitle className="text-2xl font-bold tracking-tight">Login</CardTitle>
 							</CardHeader>
 							<CardContent className="px-0">
 								<form className="grid gap-6" onSubmit={handleSubmit}>
@@ -131,12 +152,6 @@ export default function App() {
 										Login with Google
 									</Button>
 								</form>
-								<div className="mt-4 text-center text-sm">
-									Don&apos;t have an account?{" "}
-									<a href="/signup" className="underline underline-offset-4">
-										Sign up
-									</a>
-								</div>
 							</CardContent>
 						</Card>
 					</div>
