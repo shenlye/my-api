@@ -56,7 +56,7 @@ export default function App() {
 
 	return (
 		<main className="grid min-h-svh lg:grid-cols-2">
-			<div className="bg-foreground relative hidden lg:block">
+			<div className="relative hidden lg:block">
 				<div className="absolute inset-0 flex items-center justify-center text-background p-10">
 					<div className="space-y-2">
 						<h1 className="text-4xl font-bold">Welcome Back</h1>
@@ -69,7 +69,7 @@ export default function App() {
 			<div className="flex flex-col gap-4 p-6 md:p-10">
 				<div className="flex flex-1 items-center justify-center">
 					<div className="w-full max-w-sm">
-						<Card className="border-none shadow-none">
+						<Card className="border-none shadow-none bg-background">
 							<CardHeader className="px-0">
 								<CardTitle className="text-2xl">Login</CardTitle>
 								<CardDescription>
