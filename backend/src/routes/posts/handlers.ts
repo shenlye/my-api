@@ -70,6 +70,7 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
 ) => {
     const {
         title,
+        type,
         content,
         slug: providedSlug,
         description,
@@ -78,43 +79,49 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         category,
         tags,
     } = c.req.valid("json");
-    let slug = providedSlug;
-    if (!slug) {
-        if (title) {
-            const pinyinText = pinyin(title, {
-                toneType: "none",
-                type: "array",
-            }).join("-");
 
-            slug = pinyinText
-                .toLowerCase()
-                .replace(/[^\w-]+/g, "")
-                .replace(/--+/g, "-")
-                .replace(/^-+|-+$/g, "");
-        } else {
-            const datePrefix = new Date().toISOString().split("T")[0];
+    let slug: string | null = null;
 
-            const randomPart = Bun.randomUUIDv7().slice(0, 6);
+    if (type === "post") {
+        slug = providedSlug || null;
+        if (!slug) {
+            if (title) {
+                const pinyinText = pinyin(title, {
+                    toneType: "none",
+                    type: "array",
+                }).join("-");
 
-            slug = `${datePrefix}-${randomPart}`;
+                slug = pinyinText
+                    .toLowerCase()
+                    .replace(/[^\w-]+/g, "")
+                    .replace(/--+/g, "-")
+                    .replace(/^-+|-+$/g, "");
+            } else {
+                const datePrefix = new Date().toISOString().split("T")[0];
+
+                const randomPart = Bun.randomUUIDv7().slice(0, 6);
+
+                slug = `${datePrefix}-${randomPart}`;
+            }
+        }
+
+        const exists = await postService.existsBySlug(slug);
+
+        if (exists) {
+            return c.json(
+                {
+                    success: false,
+                    error: {
+                        code: "CONFLICT",
+                        message:
+                            "Slug already exists, please choose a different one",
+                    },
+                },
+                409,
+            );
         }
     }
 
-    const exists = await postService.existsBySlug(slug);
-
-    if (exists) {
-        return c.json(
-            {
-                success: false,
-                error: {
-                    code: "CONFLICT",
-                    message:
-                        "Slug already exists, please choose a different one",
-                },
-            },
-            409,
-        );
-    }
     const payload = c.get("jwtPayload");
 
     const authorId = payload?.sub;
@@ -136,6 +143,7 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
     try {
         result = await postService.createPost({
             title,
+            type,
             content,
             slug,
             description,

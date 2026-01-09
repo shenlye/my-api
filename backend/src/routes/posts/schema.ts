@@ -4,6 +4,7 @@ export const PostSchema = z
     .object({
         id: z.number().openapi({ example: 1 }),
         title: z.string().nullable().openapi({ example: "Hello World" }),
+        type: z.enum(["post", "memo"]).default("post").openapi({ example: "post" }),
         slug: z.string().nullable().openapi({ example: "hello-world" }),
         content: z.string().openapi({ example: "This is a post content" }),
         description: z
@@ -29,6 +30,10 @@ export const createPostSchema = z
             .max(100, "Title is too long")
             .optional()
             .openapi({ example: "New Post" }),
+        type: z
+            .enum(["post", "memo"])
+            .default("post")
+            .openapi({ example: "post" }),
         slug: z
             .string()
             .regex(
