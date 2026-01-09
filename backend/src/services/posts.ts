@@ -1,4 +1,5 @@
 import { and, count, eq, isNull, sql } from "drizzle-orm";
+import { pinyin } from "pinyin-pro";
 import type { DB } from "../db";
 import { posts } from "../db/schema";
 import type { CategoryService } from "./categories";
@@ -27,6 +28,25 @@ export class PostService {
 				},
 			},
 		});
+	}
+
+	generateSlug(title?: string | null): string {
+		if (title) {
+			const pinyinText = pinyin(title, {
+				toneType: "none",
+				type: "array",
+			}).join("-");
+
+			return pinyinText
+				.toLowerCase()
+				.replace(/[^\w-]+/g, "")
+				.replace(/--+/g, "-")
+				.replace(/^-+|-+$/g, "");
+		}
+
+		const datePrefix = new Date().toISOString().split("T")[0];
+		const randomPart = Bun.randomUUIDv7().slice(0, 6);
+		return `${datePrefix}-${randomPart}`;
 	}
 
 	async listPosts(page: number, limit: number, type?: "post" | "memo") {

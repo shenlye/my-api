@@ -1,5 +1,4 @@
 import type { RouteHandler } from "@hono/zod-openapi";
-import { pinyin } from "pinyin-pro";
 import { db } from "../../db";
 import { CategoryService } from "../../services/categories";
 import { PostService } from "../../services/posts";
@@ -83,27 +82,7 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
 	let slug: string | null = null;
 
 	if (type === "post") {
-		slug = providedSlug || null;
-		if (!slug) {
-			if (title) {
-				const pinyinText = pinyin(title, {
-					toneType: "none",
-					type: "array",
-				}).join("-");
-
-				slug = pinyinText
-					.toLowerCase()
-					.replace(/[^\w-]+/g, "")
-					.replace(/--+/g, "-")
-					.replace(/^-+|-+$/g, "");
-			} else {
-				const datePrefix = new Date().toISOString().split("T")[0];
-
-				const randomPart = Bun.randomUUIDv7().slice(0, 6);
-
-				slug = `${datePrefix}-${randomPart}`;
-			}
-		}
+		slug = providedSlug || postService.generateSlug(title);
 
 		const exists = await postService.existsBySlug(slug);
 
