@@ -31,6 +31,9 @@ export const posts = sqliteTable(
     {
         id: integer("id").primaryKey({ autoIncrement: true }),
         title: text("title"),
+        type: text("type", { enum: ["post", "memo"] })
+            .notNull()
+            .default("post"),
         description: text("description"),
         slug: text("slug").unique(),
         content: text("content").notNull(),

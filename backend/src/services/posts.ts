@@ -67,8 +67,9 @@ export class PostService {
 
     async createPost(values: {
         title?: string | null;
+        type?: "post" | "memo";
         content: string;
-        slug: string;
+        slug?: string | null;
         description?: string | null;
         authorId: number;
         cover?: string | null;
@@ -176,6 +177,7 @@ export class PostService {
         return {
             id: post.id,
             title: post.title,
+            type: post.type,
             slug: post.slug,
             content: post.content,
             description: post.description,
