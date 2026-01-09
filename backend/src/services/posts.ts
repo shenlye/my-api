@@ -1,4 +1,4 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, isNull, sql } from "drizzle-orm";
 import type { DB } from "../db";
 import { posts } from "../db/schema";
 import type { CategoryService } from "./categories";
@@ -13,7 +13,11 @@ export class PostService {
 
     async getPostBySlug(slug: string) {
         return await this.db.query.posts.findFirst({
-            where: and(eq(posts.slug, slug), eq(posts.isPublished, true)),
+            where: and(
+                eq(posts.slug, slug),
+                eq(posts.isPublished, true),
+                isNull(posts.deletedAt),
+            ),
             with: {
                 category: true,
                 postsToTags: {
@@ -28,7 +32,10 @@ export class PostService {
     async listPosts(page: number, limit: number) {
         const [data, total] = await Promise.all([
             this.db.query.posts.findMany({
-                where: eq(posts.isPublished, true),
+                where: and(
+                    eq(posts.isPublished, true),
+                    isNull(posts.deletedAt),
+                ),
                 limit: limit,
                 offset: (page - 1) * limit,
                 columns: {
@@ -47,7 +54,9 @@ export class PostService {
             this.db
                 .select({ count: count() })
                 .from(posts)
-                .where(eq(posts.isPublished, true)),
+                .where(
+                    and(eq(posts.isPublished, true), isNull(posts.deletedAt)),
+                ),
         ]);
 
         return {
@@ -142,7 +151,14 @@ export class PostService {
     }
 
     async deletePost(id: number) {
-        return await this.db.delete(posts).where(eq(posts.id, id)).returning();
+        return await this.db
+            .update(posts)
+            .set({
+                deletedAt: new Date(),
+                slug: sql`${posts.slug} || '_del_' || ${Date.now()}`,
+            })
+            .where(eq(posts.id, id))
+            .returning();
     }
 
     async existsBySlug(slug: string) {

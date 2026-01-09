@@ -45,6 +45,8 @@ export const posts = sqliteTable(
             onDelete: "set null",
         }),
 
+        deletedAt: integer("deleted_at", { mode: "timestamp" }),
+
         createdAt: integer("createdAt", { mode: "timestamp" })
             .notNull()
             .default(sql`(unixepoch())`),
