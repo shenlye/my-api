@@ -4,7 +4,10 @@ export const PostSchema = z
     .object({
         id: z.number().openapi({ example: 1 }),
         title: z.string().nullable().openapi({ example: "Hello World" }),
-        type: z.enum(["post", "memo"]).default("post").openapi({ example: "post" }),
+        type: z
+            .enum(["post", "memo"])
+            .default("post")
+            .openapi({ example: "post" }),
         slug: z.string().nullable().openapi({ example: "hello-world" }),
         content: z.string().openapi({ example: "This is a post content" }),
         description: z
@@ -80,5 +83,9 @@ export const paginationSchema = z.object({
         example: 10,
         description: "每页记录数，最大 100",
         type: "integer",
+    }),
+    type: z.enum(["post", "memo"]).optional().openapi({
+        example: "post",
+        description: "过滤内容类型：post (文章) 或 memo (便签)",
     }),
 });
