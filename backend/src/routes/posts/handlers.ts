@@ -45,11 +45,11 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
 export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
     c,
 ) => {
-    const { page: pageStr, limit: limitStr } = c.req.valid("query");
+    const { page: pageStr, limit: limitStr, type } = c.req.valid("query");
     const page = Math.max(1, Number(pageStr) || 1);
     const limit = Math.min(20, Math.max(1, Number(limitStr) || 10));
 
-    const { data, total } = await postService.listPosts(page, limit);
+    const { data, total } = await postService.listPosts(page, limit, type);
 
     return c.json(
         {

@@ -29,13 +29,16 @@ export class PostService {
         });
     }
 
-    async listPosts(page: number, limit: number) {
+    async listPosts(page: number, limit: number, type?: "post" | "memo") {
+        const whereClause = and(
+            eq(posts.isPublished, true),
+            isNull(posts.deletedAt),
+            type ? eq(posts.type, type) : undefined,
+        );
+
         const [data, total] = await Promise.all([
             this.db.query.posts.findMany({
-                where: and(
-                    eq(posts.isPublished, true),
-                    isNull(posts.deletedAt),
-                ),
+                where: whereClause,
                 limit: limit,
                 offset: (page - 1) * limit,
                 columns: {
@@ -51,12 +54,7 @@ export class PostService {
                 },
                 orderBy: (posts, { desc }) => [desc(posts.createdAt)],
             }),
-            this.db
-                .select({ count: count() })
-                .from(posts)
-                .where(
-                    and(eq(posts.isPublished, true), isNull(posts.deletedAt)),
-                ),
+            this.db.select({ count: count() }).from(posts).where(whereClause),
         ]);
 
         return {
