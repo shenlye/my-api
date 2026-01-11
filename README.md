@@ -1,5 +1,7 @@
 # My Simple Blog Admin
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/shenlye/my-api)
+
 English version: [README_EN.md](README_EN.md)
 
 基于 Bun + Hono 的博客后台。
