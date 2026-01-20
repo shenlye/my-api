@@ -1,5 +1,5 @@
-import { LayoutDashboard, Users } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { FileText, LayoutDashboard, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -12,11 +12,11 @@ import {
 
 const items = [
   { title: "概览", url: "/dashboard", icon: LayoutDashboard },
+  { title: "文章管理", url: "/dashboard/posts", icon: FileText },
   { title: "用户管理", url: "/dashboard/users", icon: Users },
 ];
 
 export function AppSidebar() {
-  const { pathname } = useLocation();
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -24,17 +24,15 @@ export function AppSidebar() {
           <SidebarGroupLabel>管理后台</SidebarGroupLabel>
           <SidebarMenu>
             {items.map((item) => {
-              const isActive = pathname === item.url;
               return (
                 <SidebarMenuItem
                   key={item.title}
-                  className={isActive ? "bg-primary text-primary-foreground" : ""}
                 >
-                  <SidebarMenuButton asChild className="rounded-none">
-                    <a href={item.url}>
+                  <SidebarMenuButton asChild>
+                    <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               );

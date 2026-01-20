@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, use, useEffect, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -36,7 +36,8 @@ export function ThemeProvider({
     root.classList.remove("light", "dark");
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
         ? "dark"
         : "light";
 
@@ -61,7 +62,7 @@ export function ThemeProvider({
     </ThemeProviderContext>
   );
 }
-/* eslint-disable react-refresh/only-export-components */
+
 export function useTheme() {
   const context = use(ThemeProviderContext);
 
