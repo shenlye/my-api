@@ -1,4 +1,4 @@
-import type { Post, PostFormData, CreatePostData } from "./types";
+import type { CreatePostData, Post, PostFormData } from "./types";
 import type { MilkdownEditorRef } from "@/components/milkdown-editor";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
@@ -42,13 +42,7 @@ export default function PostsPage() {
   };
 
   const handleCreatePost = (values: CreatePostData) => {
-    const payload = {
-      ...values,
-      slug: values.slug || undefined,
-      title: values.title || undefined,
-      description: values.description || undefined,
-    };
-    createMutation.mutate(payload, {
+    createMutation.mutate(values, {
       onSuccess: (response) => {
         setIsCreateDialogOpen(false);
         // 创建成功后，自动打开内容编辑器
