@@ -4,7 +4,7 @@ import { client } from "@/lib/api";
 
 export function usePosts(page: number, limit: number) {
   return useQuery({
-    queryKey: ["posts", page],
+    queryKey: ["posts", page, limit],
     queryFn: async () => {
       const res = await client.api.v1.posts.$get({
         query: {
@@ -36,12 +36,31 @@ export function usePost(slug: string | undefined) {
   });
 }
 
+export function usePostById(id: number | undefined) {
+  return useQuery({
+    queryKey: ["post", id],
+    queryFn: async () => {
+      if (id === undefined)
+        return null;
+      const res = await client.api.v1.posts.id[":id"].$get({
+        param: { id: id.toString() },
+      });
+      if (!res.ok)
+        throw new Error("Failed to fetch post details");
+      return res.json();
+    },
+    enabled: id !== undefined,
+  });
+}
+
 export function useUpdatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ id, values }: { id: number; values: any }) => {
       const token = localStorage.getItem("token");
+      if (!token)
+        throw new Error("No token found");
       const res = await client.api.v1.posts[":id"].$patch({
         param: { id: id.toString() },
         json: values,

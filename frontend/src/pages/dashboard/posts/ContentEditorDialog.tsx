@@ -79,8 +79,10 @@ export function ContentEditorDialog({
                   </div>
                 )
               : (
-                  <div className="text-center py-24 text-muted-foreground">
-                    无法加载文章内容
+                  <div className="container max-w-5xl mx-auto py-8 px-6">
+                    <MilkdownEditor
+                      ref={editorRef}
+                    />
                   </div>
                 )}
         </div>

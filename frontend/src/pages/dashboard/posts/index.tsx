@@ -8,7 +8,7 @@ import DashboardLayout from "../layout";
 import { ContentEditorDialog } from "./ContentEditorDialog";
 import { DeletePostDialog } from "./DeletePostDialog";
 import { EditPostDialog } from "./EditPostDialog";
-import { useDeletePost, usePost, usePosts, useUpdatePost } from "./hooks/usePosts";
+import { useDeletePost, usePostById, usePosts, useUpdatePost } from "./hooks/usePosts";
 import { PostsTable } from "./PostsTable";
 
 const POSTS_PER_PAGE = 10;
@@ -18,33 +18,16 @@ export default function PostsPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [contentEditPost, setContentEditPost] = useState<Post | null>(null);
-  const [formData, setFormData] = useState<PostFormData>({
-    title: "",
-    slug: "",
-    description: "",
-    isPublished: false,
-  });
+
   const editorRef = useRef<MilkdownEditorRef>(null);
 
   const { data, isLoading } = usePosts(page, POSTS_PER_PAGE);
   const totalPages = data?.meta ? Math.ceil(data.meta.total / POSTS_PER_PAGE) : 0;
 
-  const slug = editPost?.slug ?? contentEditPost?.slug ?? undefined;
-  const { data: fullPost, isLoading: isLoadingPost } = usePost(slug);
-
+  const postId = editPost?.id ?? contentEditPost?.id ?? undefined;
+  const { data: fullPost, isLoading: isLoadingPost } = usePostById(postId);
   const updateMutation = useUpdatePost();
   const deleteMutation = useDeletePost();
-
-  // 当获取到文章详情时，初始化表单数据
-  const postData = fullPost?.data;
-  if (postData && editPost && formData.title === "" && formData.slug === "") {
-    setFormData({
-      title: postData.title || "",
-      slug: postData.slug || "",
-      description: postData.description || "",
-      isPublished: postData.isPublished || false,
-    });
-  }
 
   const handleEditPost = (post: Post) => {
     setEditPost(post);
@@ -53,24 +36,22 @@ export default function PostsPage() {
   const handleCloseEditDialog = (open: boolean) => {
     if (!open) {
       setEditPost(null);
-      setFormData({ title: "", slug: "", description: "", isPublished: false });
     }
   };
 
-  const handleSavePost = () => {
+  const handleSavePost = (values: PostFormData) => {
     if (editPost) {
       updateMutation.mutate({
         id: editPost.id,
         values: {
-          title: formData.title || undefined,
-          slug: formData.slug || undefined,
-          description: formData.description || undefined,
-          isPublished: formData.isPublished,
+          title: values.title || undefined,
+          slug: values.slug || undefined,
+          description: values.description || undefined,
+          isPublished: values.isPublished,
         },
       }, {
         onSuccess: () => {
           setEditPost(null);
-          setFormData({ title: "", slug: "", description: "", isPublished: false });
         },
       });
     }
@@ -138,27 +119,29 @@ export default function PostsPage() {
         isPending={deleteMutation.isPending}
       />
 
-      <EditPostDialog
-        open={editPost !== null}
-        onOpenChange={handleCloseEditDialog}
-        post={fullPost?.data as Post | null}
-        isLoading={isLoadingPost}
-        formData={formData}
-        onFormDataChange={setFormData}
-        onSave={handleSavePost}
-        onEditContent={handleEditContent}
-        isSaving={updateMutation.isPending}
-      />
+      {editPost && (
+        <EditPostDialog
+          open={true}
+          onOpenChange={handleCloseEditDialog}
+          post={fullPost?.data as Post | null}
+          isLoading={isLoadingPost}
+          onSave={handleSavePost}
+          onEditContent={handleEditContent}
+          isSaving={updateMutation.isPending}
+        />
+      )}
 
-      <ContentEditorDialog
-        open={contentEditPost !== null}
-        onOpenChange={open => !open && setContentEditPost(null)}
-        post={fullPost?.data as Post | null}
-        isLoading={isLoadingPost}
-        onSave={handleSaveContent}
-        isSaving={updateMutation.isPending}
-        editorRef={editorRef}
-      />
+      {contentEditPost && (
+        <ContentEditorDialog
+          open={true}
+          onOpenChange={open => !open && setContentEditPost(null)}
+          post={fullPost?.data as Post | null}
+          isLoading={isLoadingPost}
+          onSave={handleSaveContent}
+          isSaving={updateMutation.isPending}
+          editorRef={editorRef}
+        />
+      )}
     </DashboardLayout>
   );
 }

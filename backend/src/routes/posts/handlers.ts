@@ -2,6 +2,7 @@ import type { RouteHandler } from "@hono/zod-openapi";
 import type {
   createPostRoute,
   deletePostRoute,
+  getPostByIdRoute,
   getPostRoute,
   listPostsRoute,
   updatePostRoute,
@@ -18,6 +19,33 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
   const { slug } = c.req.valid("param");
 
   const result = await postService.getPostBySlug(slug);
+
+  if (!result) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "NOT_FOUND",
+          message: "Post not found",
+        },
+      },
+      404,
+    );
+  }
+
+  return c.json(
+    {
+      success: true,
+      data: postService.formatPost(result),
+    },
+    200,
+  );
+};
+
+export const getPostByIdHandler: RouteHandler<typeof getPostByIdRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+
+  const result = await postService.getPostById(id);
 
   if (!result) {
     return c.json(

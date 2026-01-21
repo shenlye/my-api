@@ -3,6 +3,7 @@ import { defaultHook } from "../../lib/route-factory";
 import {
   createPostHandler,
   deletePostHandler,
+  getPostByIdHandler,
   getPostHandler,
   listPostsHandler,
   updatePostHandler,
@@ -10,6 +11,7 @@ import {
 import {
   createPostRoute,
   deletePostRoute,
+  getPostByIdRoute,
   getPostRoute,
   listPostsRoute,
   updatePostRoute,
@@ -17,6 +19,7 @@ import {
 
 const postsRouter = new OpenAPIHono({ defaultHook })
   .openapi(getPostRoute, getPostHandler)
+  .openapi(getPostByIdRoute, getPostByIdHandler)
   .openapi(listPostsRoute, listPostsHandler)
   .openapi(createPostRoute, createPostHandler)
   .openapi(updatePostRoute, updatePostHandler)
