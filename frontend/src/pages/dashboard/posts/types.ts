@@ -11,6 +11,18 @@ export interface CreatePostData extends PostFormData {
   content: string;
 }
 
+export interface UpdatePostData {
+  title?: string;
+  slug?: string;
+  description?: string;
+  content?: string;
+  isPublished?: boolean;
+  type?: "post" | "memo";
+  cover?: string;
+  category?: string;
+  tags?: string[];
+}
+
 export interface Post {
   id: number;
   title: string | null;
