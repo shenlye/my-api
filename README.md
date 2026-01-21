@@ -2,42 +2,41 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/shenlye/my-api)
 
-English version: [README_EN.md](README_EN.md)
-
-基于 Bun + Hono 的博客后台。
+基于 Bun + Hono + React 19 的全栈博客管理系统。
 
 ## 技术栈
 
-- Bun - JavaScript 运行时
-- Hono - Web 框架
-- Drizzle ORM - 数据库 ORM
-- Biome - 代码格式化和检查
-- SQLite - 数据库 (使用 Bun 内置驱动)
-- Pino - 日志
+### 后端 (Backend)
+- **Runtime**: Bun
+- **Framework**: Hono + Zod OpenAPI
+- **ORM**: Drizzle ORM (SQLite)
+- **Auth**: JWT
+- **Linter**: ESLint (@antfu/config)
 
-## 本地开发
+### 前端 (Frontend)
+- **Framework**: React 19 + Vite
+- **UI Components**: Shadcn UI + Tailwind CSS 4
+- **Editor**: Milkdown Crepe
+- **Data Fetching**: TanStack Query v5
+- **Routing**: React Router 7
+
+## 快速开始
 
 ### 1. 安装依赖
-
 ```bash
 bun install
 ```
 
 ### 2. 初始化数据库
-
 ```bash
 bunx drizzle-kit push
 ```
 
-这会根据 schema 创建数据库表结构。
-
-### 3. 启动开发服务器
-
+### 3. 启动开发环境
 ```bash
 bun run dev
 ```
-
-服务默认运行在 http://localhost:3000
+后端默认运行在 `http://localhost:3000`，前端运行在 `http://localhost:5173`。
 
 ## Docker 部署
 
@@ -70,26 +69,14 @@ services:
     volumes:
       - ./data:/app/data
     environment:
-      DATABASE_URL: /app/data/sqlite.db
-      JWT_SECRET: your_jwt_secret_key
+      JWT_SECRET: your_secret
       DEFAULT_ADMIN_PASSWORD: admin123456
-      ALLOWED_ORIGINS: http://localhost:5173
-      PORT: 3000
+      ALLOWED_ORIGINS: http://your-domain.com
     restart: always
 ```
 
-### 环境变量
-
-```env
-DATABASE_URL=your_database_url
-JWT_SECRET=your_jwt_secret_key
-DEFAULT_ADMIN_PASSWORD=your_default_admin_password
-ALLOWED_ORIGINS=http://localhost:5173
-PORT=3000
-```
-
-说明：
-- `DATABASE_URL`: SQLite 数据库文件路径，默认为/app/data/sqlite.db
-- `JWT_SECRET`: 用于生成和验证 JWT Token 的密钥。在生产环境下，如果不配置此项，系统将自动生成一个随机密钥并持久化保存。
-- `DEFAULT_ADMIN_PASSWORD`: 首次启动时自动创建的管理员账号 (admin) 的密码，默认为admin123456
-- `ALLOWED_ORIGINS`: 前端域名
+## 环境变量
+- `DATABASE_URL`: SQLite 路径，默认 `/app/data/sqlite.db`
+- `JWT_SECRET`: JWT 密钥
+- `DEFAULT_ADMIN_PASSWORD`: 初始管理员密码 (账号: admin)
+- `ALLOWED_ORIGINS`: 允许的跨域域名

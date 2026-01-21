@@ -3,6 +3,7 @@ export interface PostFormData {
   slug: string;
   description: string;
   isPublished: boolean;
+  type?: "post" | "memo";
 }
 
 export interface CreatePostData extends PostFormData {
