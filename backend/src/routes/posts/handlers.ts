@@ -27,7 +27,8 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
     try {
       await verify(token, env.JWT_SECRET);
       onlyPublished = false;
-    } catch {
+    }
+    catch {
       // Invalid token, keep onlyPublished as true
     }
   }
@@ -66,7 +67,8 @@ export const getPostByIdHandler: RouteHandler<typeof getPostByIdRoute> = async (
     try {
       await verify(token, env.JWT_SECRET);
       onlyPublished = false;
-    } catch {
+    }
+    catch {
       // Invalid token, keep onlyPublished as true
     }
   }
@@ -109,7 +111,8 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (c) =
     try {
       await verify(token, env.JWT_SECRET);
       onlyPublished = false;
-    } catch {
+    }
+    catch {
       // Invalid token, keep onlyPublished as true
     }
   }
