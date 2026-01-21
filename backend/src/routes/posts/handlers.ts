@@ -7,7 +7,9 @@ import type {
   listPostsRoute,
   updatePostRoute,
 } from "./routes";
+import { verify } from "hono/jwt";
 import { db } from "../../db";
+import { env } from "../../lib/env";
 import { CategoryService } from "../../services/categories";
 import { PostService } from "../../services/posts";
 import { TagService } from "../../services/tags";
@@ -21,7 +23,13 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
   const authHeader = c.req.header("Authorization");
   let onlyPublished = true;
   if (authHeader?.startsWith("Bearer ")) {
-    onlyPublished = false;
+    const token = authHeader.substring(7);
+    try {
+      await verify(token, env.JWT_SECRET);
+      onlyPublished = false;
+    } catch {
+      // Invalid token, keep onlyPublished as true
+    }
   }
 
   const result = await postService.getPostBySlug(slug, onlyPublished);
@@ -54,7 +62,13 @@ export const getPostByIdHandler: RouteHandler<typeof getPostByIdRoute> = async (
   const authHeader = c.req.header("Authorization");
   let onlyPublished = true;
   if (authHeader?.startsWith("Bearer ")) {
-    onlyPublished = false;
+    const token = authHeader.substring(7);
+    try {
+      await verify(token, env.JWT_SECRET);
+      onlyPublished = false;
+    } catch {
+      // Invalid token, keep onlyPublished as true
+    }
   }
 
   const result = await postService.getPostById(id, onlyPublished);
@@ -86,15 +100,18 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (c) =
   const page = Math.max(1, Number(pageStr) || 1);
   const limit = Math.min(20, Math.max(1, Number(limitStr) || 10));
 
-  // 尝试获取 token 检查是否是管理员
+  // 验证 JWT token 以确定是否可以访问未发布的文章
   const authHeader = c.req.header("Authorization");
   let onlyPublished = true;
 
   if (authHeader?.startsWith("Bearer ")) {
-    // 这里简单判断一下是否有 token，实际项目中应该验证 JWT 载荷中的角色
-    // 因为我们的 dashboard 已经有权限校验，这里只要有合法 token 且调用此接口
-    // 我们就倾向于认为是在后台管理环境下
-    onlyPublished = false;
+    const token = authHeader.substring(7);
+    try {
+      await verify(token, env.JWT_SECRET);
+      onlyPublished = false;
+    } catch {
+      // Invalid token, keep onlyPublished as true
+    }
   }
 
   const { data, total } = await postService.listPosts(page, limit, type, category, tag, onlyPublished);

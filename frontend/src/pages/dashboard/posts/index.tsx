@@ -1,4 +1,4 @@
-import type { Post, PostFormData } from "./types";
+import type { Post, PostFormData, CreatePostData } from "./types";
 import type { MilkdownEditorRef } from "@/components/milkdown-editor";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
@@ -41,7 +41,7 @@ export default function PostsPage() {
     }
   };
 
-  const handleCreatePost = (values: any) => {
+  const handleCreatePost = (values: CreatePostData) => {
     const payload = {
       ...values,
       slug: values.slug || undefined,
