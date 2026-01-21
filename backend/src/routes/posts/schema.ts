@@ -29,7 +29,7 @@ export const createPostSchema = z
       .openapi({ example: "new-post" }),
     content: z
       .string()
-      .min(1, "Content is required")
+      .default("")
       .openapi({ example: "This is the content of the new post." }),
     description: z.string().optional().openapi({ example: "A short description of the post" }),
     cover: z.url().optional().openapi({ example: "https://example.com/cover.jpg" }),
@@ -44,7 +44,23 @@ export const createPostSchema = z
   })
   .openapi("CreatePost");
 
-export const updatePostSchema = createPostSchema.partial().openapi("UpdatePost");
+export const updatePostSchema = z
+  .object({
+    title: z.string().max(100, "Title is too long").optional(),
+    type: z.enum(["post", "memo"]).optional(),
+    slug: z
+      .string()
+      .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens")
+      .max(100, "Slug is too long")
+      .optional(),
+    content: z.string().optional(),
+    description: z.string().optional(),
+    cover: z.url().optional(),
+    isPublished: z.boolean().optional(),
+    category: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+  })
+  .openapi("UpdatePost");
 
 export const paginationSchema = z.object({
   page: z.coerce.number().int().positive().default(1).openapi({

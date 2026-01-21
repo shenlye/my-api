@@ -51,7 +51,13 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
 export const getPostByIdHandler: RouteHandler<typeof getPostByIdRoute> = async (c) => {
   const { id } = c.req.valid("param");
 
-  const result = await postService.getPostById(id);
+  const authHeader = c.req.header("Authorization");
+  let onlyPublished = true;
+  if (authHeader?.startsWith("Bearer ")) {
+    onlyPublished = false;
+  }
+
+  const result = await postService.getPostById(id, onlyPublished);
 
   if (!result) {
     return c.json(

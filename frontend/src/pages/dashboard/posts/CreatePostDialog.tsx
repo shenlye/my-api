@@ -1,3 +1,6 @@
+import type { CreatePostData } from "./types";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,9 +21,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
-import { useState } from "react";
-import type { CreatePostData } from "./types";
 
 interface CreatePostDialogProps {
   open: boolean;
@@ -40,7 +40,7 @@ export function CreatePostDialog({
     slug: "",
     description: "",
     type: "post",
-    content: " ", // 默认给一个空格，后端要求 content 不能为空
+    content: "",
     isPublished: false,
   });
 
@@ -65,8 +65,7 @@ export function CreatePostDialog({
             <Select
               value={formData.type}
               onValueChange={(value: "post" | "memo") =>
-                setFormData({ ...formData, type: value })
-              }
+                setFormData({ ...formData, type: value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="选择类型" />
@@ -84,7 +83,7 @@ export function CreatePostDialog({
               id="title"
               placeholder="文章标题"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={e => setFormData({ ...formData, title: e.target.value })}
               required={formData.type === "post"}
             />
           </div>
@@ -102,7 +101,7 @@ export function CreatePostDialog({
               id="slug"
               placeholder="my-new-post"
               value={formData.slug}
-              onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+              onChange={e => setFormData({ ...formData, slug: e.target.value })}
             />
           </div>
 
@@ -112,9 +111,8 @@ export function CreatePostDialog({
               id="description"
               placeholder="简短的文章描述..."
               value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
+              onChange={e =>
+                setFormData({ ...formData, description: e.target.value })}
             />
           </div>
 
@@ -128,9 +126,8 @@ export function CreatePostDialog({
             <Switch
               id="isPublished"
               checked={formData.isPublished}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, isPublished: checked })
-              }
+              onCheckedChange={checked =>
+                setFormData({ ...formData, isPublished: checked })}
             />
           </div>
 

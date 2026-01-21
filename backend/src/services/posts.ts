@@ -31,9 +31,14 @@ export class PostService {
     });
   }
 
-  async getPostById(id: number) {
+  async getPostById(id: number, onlyPublished = true) {
+    const conditions = [eq(posts.id, id), isNull(posts.deletedAt)];
+    if (onlyPublished) {
+      conditions.push(eq(posts.isPublished, true));
+    }
+
     return await this.db.query.posts.findFirst({
-      where: and(eq(posts.id, id), isNull(posts.deletedAt)),
+      where: and(...conditions),
       with: {
         category: true,
         postsToTags: {
