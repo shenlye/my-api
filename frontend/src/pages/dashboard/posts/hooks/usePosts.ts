@@ -71,8 +71,15 @@ export function useCreatePost() {
       const token = localStorage.getItem("token");
       if (!token)
         throw new Error("No token found");
+
+      // Clean up values: if slug is empty string, remove it
+      const cleanedValues = { ...values };
+      if (!cleanedValues.slug) {
+        delete (cleanedValues as any).slug;
+      }
+
       const res = await client.api.v1.posts.$post({
-        json: values,
+        json: cleanedValues as any,
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -102,9 +109,16 @@ export function useUpdatePost() {
       const token = localStorage.getItem("token");
       if (!token)
         throw new Error("No token found");
+
+      // Clean up values: if slug is empty string, remove it
+      const cleanedValues = { ...values };
+      if (cleanedValues.slug === "") {
+        delete cleanedValues.slug;
+      }
+
       const res = await client.api.v1.posts[":id"].$patch({
         param: { id: id.toString() },
-        json: values,
+        json: cleanedValues,
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
