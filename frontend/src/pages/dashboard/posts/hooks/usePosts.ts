@@ -1,3 +1,4 @@
+import type { CreatePostData, UpdatePostData } from "../types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { client } from "@/lib/api";
@@ -66,7 +67,7 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: CreatePostData) => {
       const token = localStorage.getItem("token");
       if (!token)
         throw new Error("No token found");
@@ -97,7 +98,7 @@ export function useUpdatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, values }: { id: number; values: any }) => {
+    mutationFn: async ({ id, values }: { id: number; values: UpdatePostData }) => {
       const token = localStorage.getItem("token");
       if (!token)
         throw new Error("No token found");
