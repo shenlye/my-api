@@ -26,6 +26,20 @@ export class PostService {
     });
   }
 
+  async getPostById(id: number) {
+    return await this.db.query.posts.findFirst({
+      where: and(eq(posts.id, id), isNull(posts.deletedAt)),
+      with: {
+        category: true,
+        postsToTags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
+    });
+  }
+
   generateSlug(title?: string | null): string {
     if (title) {
       const pinyinText = pinyin(title, {

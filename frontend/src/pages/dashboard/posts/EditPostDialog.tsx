@@ -1,5 +1,6 @@
 import type { Post, PostFormData } from "./types";
 import { FileText, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,9 +19,7 @@ interface EditPostDialogProps {
   onOpenChange: (open: boolean) => void;
   post: Post | null;
   isLoading: boolean;
-  formData: PostFormData;
-  onFormDataChange: (data: PostFormData) => void;
-  onSave: () => void;
+  onSave: (data: PostFormData) => void;
   onEditContent: () => void;
   isSaving: boolean;
 }
@@ -30,8 +29,6 @@ export function EditPostDialog({
   onOpenChange,
   post,
   isLoading,
-  formData,
-  onFormDataChange,
   onSave,
   onEditContent,
   isSaving,
@@ -46,89 +43,108 @@ export function EditPostDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {isLoading
+        {isLoading || !post
           ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
               </div>
             )
-          : post
-            ? (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">标题</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={e => onFormDataChange({ ...formData, title: e.target.value })}
-                      placeholder="文章标题"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="slug">Slug</Label>
-                    <Input
-                      id="slug"
-                      value={formData.slug}
-                      onChange={e => onFormDataChange({ ...formData, slug: e.target.value })}
-                      placeholder="url-friendly-slug"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      用于 URL 的唯一标识，只能包含小写字母、数字和连字符
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">描述</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={e => onFormDataChange({ ...formData, description: e.target.value })}
-                      placeholder="文章的简短描述..."
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="isPublished"
-                      checked={formData.isPublished}
-                      onChange={e => onFormDataChange({ ...formData, isPublished: e.target.checked })}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <Label htmlFor="isPublished">发布文章</Label>
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={onEditContent}
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    编辑正文内容
-                  </Button>
-                </div>
-              )
-            : (
-                <div className="text-center py-8 text-muted-foreground">
-                  无法加载文章信息
-                </div>
-              )}
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
-          </Button>
-          <Button
-            onClick={onSave}
-            disabled={isSaving || isLoading}
-          >
-            {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            保存
-          </Button>
-        </DialogFooter>
+          : (
+              <EditPostForm
+                post={post}
+                onSave={onSave}
+                onEditContent={onEditContent}
+                isSaving={isSaving}
+                onClose={() => onOpenChange(false)}
+              />
+            )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+interface EditPostFormProps {
+  post: Post;
+  onSave: (data: PostFormData) => void;
+  onEditContent: () => void;
+  isSaving: boolean;
+  onClose: () => void;
+}
+
+function EditPostForm({ post, onSave, onEditContent, isSaving, onClose }: EditPostFormProps) {
+  const [formData, setFormData] = useState<PostFormData>({
+    title: post.title || "",
+    slug: post.slug || "",
+    description: post.description || "",
+    isPublished: post.isPublished || false,
+  });
+
+  const handleSubmit = () => {
+    onSave(formData);
+  };
+
+  return (
+    <>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="title">标题</Label>
+          <Input
+            id="title"
+            value={formData.title}
+            onChange={e => setFormData({ ...formData, title: e.target.value })}
+            placeholder="文章标题"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="slug">Slug</Label>
+          <Input
+            id="slug"
+            value={formData.slug}
+            onChange={e => setFormData({ ...formData, slug: e.target.value })}
+            placeholder="url-friendly-slug"
+          />
+          <p className="text-xs text-muted-foreground">
+            用于 URL 的唯一标识，只能包含小写字母、数字和连字符
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">描述</Label>
+          <Textarea
+            id="description"
+            value={formData.description}
+            onChange={e => setFormData({ ...formData, description: e.target.value })}
+            placeholder="文章的简短描述..."
+            rows={3}
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="isPublished"
+            checked={formData.isPublished}
+            onChange={e => setFormData({ ...formData, isPublished: e.target.checked })}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <Label htmlFor="isPublished">发布文章</Label>
+        </div>
+      </div>
+
+      <DialogFooter className="border-t pt-4 mt-4">
+        <Button variant="outline" onClick={onEditContent} className="mr-auto" disabled={isSaving}>
+          <FileText className="w-4 h-4 mr-2" />
+          编辑内容
+        </Button>
+        <Button variant="ghost" onClick={onClose} disabled={isSaving}>
+          取消
+        </Button>
+        <Button onClick={handleSubmit} disabled={isSaving}>
+          {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          保存修改
+        </Button>
+      </DialogFooter>
+    </>
   );
 }

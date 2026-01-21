@@ -26,6 +26,28 @@ export const getPostRoute = createRoute({
   },
 });
 
+export const getPostByIdRoute = createRoute({
+  method: "get",
+  path: "/id/{id}",
+  request: {
+    params: z.object({
+      id: z.coerce.number().openapi({ example: 1 }),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: createSuccessSchema(PostSchema),
+        },
+      },
+      description: "Retrieve the post by ID",
+    },
+    404: createErrorResponse("Post not found"),
+    500: createErrorResponse("Internal server error"),
+  },
+});
+
 export const listPostsRoute = createRoute({
   method: "get",
   path: "/",
