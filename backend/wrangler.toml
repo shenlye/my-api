@@ -6,7 +6,7 @@ workers_dev = true
 preview_urls = true
 
 # 生产环境配置（默认环境）
-vars = { ALLOWED_ORIGINS = "https://your-production-domain.com" }
+vars = { ALLOWED_ORIGINS = "https://hub.shenley.cn" }
 
 [[d1_databases]]
 binding = "DB"
