@@ -45,7 +45,24 @@ export function createRegisterHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
     const authService = c.get("authService");
 
-    const userCount = await authService.countUsers();
+    let userCount: number;
+    try {
+      userCount = await authService.countUsers();
+    } catch (error: any) {
+      if (error.message?.includes("no such table")) {
+        return c.json(
+          {
+            success: false,
+            error: {
+              code: "DATABASE_NOT_INITIALIZED",
+              message: "Database tables are missing. Please run 'pnpm run migrate:remote' first.",
+            },
+          },
+          500,
+        );
+      }
+      throw error;
+    }
 
     if (userCount > 0) {
       return c.json(

@@ -14,9 +14,11 @@
     "generate": "drizzle-kit generate",
     "migrate:local": "wrangler d1 migrations apply DB --local -e development",
     "migrate:dev": "wrangler d1 migrations apply DB --remote -e development",
-    "migrate:remote": "wrangler d1 migrations apply DB --remote -e production",
+    "migrate:remote": "wrangler d1 migrations apply DB --remote",
     "db:studio": "drizzle-kit studio",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "logs": "wrangler tail",
+    "logs:dev": "wrangler tail -e development"
   },
   "dependencies": {
     "@hono/zod-openapi": "^1.2.0",
