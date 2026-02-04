@@ -19,17 +19,13 @@ import {
 } from "./routes";
 
 export function createPostsRouter() {
-  const postsRouter = new OpenAPIHono<{ Bindings: Env }>({ defaultHook });
-
-  postsRouter
+  return new OpenAPIHono<{ Bindings: Env }>({ defaultHook })
     .openapi(getPostRoute, createGetPostHandler())
     .openapi(getPostByIdRoute, createGetPostByIdHandler())
     .openapi(listPostsRoute, createListPostsHandler())
     .openapi(createPostRoute, createCreatePostHandler())
     .openapi(updatePostRoute, createUpdatePostHandler())
     .openapi(deletePostRoute, createDeletePostHandler());
-
-  return postsRouter;
 }
 
 export default createPostsRouter;

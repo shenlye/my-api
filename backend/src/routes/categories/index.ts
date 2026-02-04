@@ -5,11 +5,8 @@ import { createListCategoriesHandler } from "./handlers";
 import { listCategoriesRoute } from "./routes";
 
 export function createCategoriesRouter() {
-  const categoriesRouter = new OpenAPIHono<{ Bindings: Env }>({ defaultHook });
-
-  categoriesRouter.openapi(listCategoriesRoute, createListCategoriesHandler());
-
-  return categoriesRouter;
+  return new OpenAPIHono<{ Bindings: Env }>({ defaultHook })
+    .openapi(listCategoriesRoute, createListCategoriesHandler());
 }
 
 export default createCategoriesRouter;

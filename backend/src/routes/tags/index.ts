@@ -5,11 +5,8 @@ import { createListTagsHandler } from "./handlers";
 import { listTagsRoute } from "./routes";
 
 export function createTagsRouter() {
-  const tagsRouter = new OpenAPIHono<{ Bindings: Env }>({ defaultHook });
-
-  tagsRouter.openapi(listTagsRoute, createListTagsHandler());
-
-  return tagsRouter;
+  return new OpenAPIHono<{ Bindings: Env }>({ defaultHook })
+    .openapi(listTagsRoute, createListTagsHandler());
 }
 
 export default createTagsRouter;

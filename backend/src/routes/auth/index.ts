@@ -5,14 +5,10 @@ import { createChangePasswordHandler, createLoginHandler, createRegisterHandler 
 import { changePasswordRoute, loginRoute, registerRoute } from "./routers";
 
 export function createAuthRouter() {
-  const authRouter = new OpenAPIHono<{ Bindings: Env }>({ defaultHook });
-
-  authRouter
+  return new OpenAPIHono<{ Bindings: Env }>({ defaultHook })
     .openapi(loginRoute, createLoginHandler())
     .openapi(registerRoute, createRegisterHandler())
     .openapi(changePasswordRoute, createChangePasswordHandler());
-
-  return authRouter;
 }
 
 export default createAuthRouter;

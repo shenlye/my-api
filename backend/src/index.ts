@@ -32,10 +32,11 @@ app.use("*", async (c, next) => {
 });
 
 // 动态挂载路由
-app.route("/api/v1/posts", createPostsRouter());
-app.route("/api/v1/auth", createAuthRouter());
-app.route("/api/v1/categories", createCategoriesRouter());
-app.route("/api/v1/tags", createTagsRouter());
+const routes = app
+  .route("/api/v1/posts", createPostsRouter())
+  .route("/api/v1/auth", createAuthRouter())
+  .route("/api/v1/categories", createCategoriesRouter())
+  .route("/api/v1/tags", createTagsRouter());
 
 app.onError((err, c) => {
   console.error(err);
@@ -66,11 +67,11 @@ app.doc("/api/v1/openapi.json", {
 
 app.get("/docs", Scalar({ url: "/api/v1/openapi.json" }));
 
-app.get("/health", (c) => {
+const _finalApp = routes.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-export type AppType = typeof app;
+export type AppType = typeof _finalApp;
 
 export default app;
 
