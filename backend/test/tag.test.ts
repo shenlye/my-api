@@ -1,17 +1,20 @@
-import { beforeAll, describe, expect, test } from "bun:test";
-import { db } from "../src/db";
+import { env } from "cloudflare:test";
+import { beforeAll, describe, expect, it } from "vitest";
+import { createDb } from "../src/db";
 import { users } from "../src/db/schema";
 import { app } from "../src/index";
+import { hashPassword } from "../src/services/auth";
 
-describe("Tag and Filtering tests", () => {
+describe("tag and Filtering tests", () => {
   let adminToken: string;
-  const tagName1 = `Tag1-${Bun.randomUUIDv7().slice(-12)}`;
-  const tagName2 = `Tag2-${Bun.randomUUIDv7().slice(-12)}`;
+  const db = createDb(env.DB);
+  const tagName1 = `Tag1-${crypto.randomUUID().slice(-12)}`;
+  const tagName2 = `Tag2-${crypto.randomUUID().slice(-12)}`;
 
   beforeAll(async () => {
     // Ensure admin user exists
-    const passwordHash = await Bun.password.hash("admin123");
-    const username = `tagadmin-${Bun.randomUUIDv7().slice(-12)}`;
+    const passwordHash = await hashPassword("admin123");
+    const username = `tagadmin-${crypto.randomUUID().slice(-12)}`;
     await db
       .insert(users)
       .values({
@@ -30,7 +33,7 @@ describe("Tag and Filtering tests", () => {
         identifier: username,
         password: "admin123",
       }),
-    });
+    }, env);
 
     let loginData = await loginRes.json();
     if (!loginData.success) {
@@ -42,7 +45,7 @@ describe("Tag and Filtering tests", () => {
           identifier: "testadmin",
           password: "admin123",
         }),
-      });
+      }, env);
       loginData = await loginRes2.json();
     }
 
@@ -60,12 +63,12 @@ describe("Tag and Filtering tests", () => {
         "Authorization": `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        title: `Post with Tag1 ${Bun.randomUUIDv7()}`,
+        title: `Post with Tag1 ${crypto.randomUUID()}`,
         content: "Content",
         tags: [tagName1],
         isPublished: true,
       }),
-    });
+    }, env);
 
     const _res2 = await app.request("/api/v1/posts", {
       method: "POST",
@@ -74,16 +77,16 @@ describe("Tag and Filtering tests", () => {
         "Authorization": `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        title: `Post with Tag1 and Tag2 ${Bun.randomUUIDv7()}`,
+        title: `Post with Tag1 and Tag2 ${crypto.randomUUID()}`,
         content: "Content",
         tags: [tagName1, tagName2],
         isPublished: true,
       }),
-    });
+    }, env);
   });
 
-  test("GET /api/v1/tags - should list all tags with post counts", async () => {
-    const res = await app.request("/api/v1/tags");
+  it("gET /api/v1/tags - should list all tags with post counts", async () => {
+    const res = await app.request("/api/v1/tags", {}, env);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
@@ -97,16 +100,16 @@ describe("Tag and Filtering tests", () => {
     expect(tag2.postCount).toBe(1);
   });
 
-  test("GET /api/v1/posts?tag - should filter posts by tag name", async () => {
+  it("gET /api/v1/posts?tag - should filter posts by tag name", async () => {
     // Filter by Tag1
-    const res1 = await app.request(`/api/v1/posts?tag=${tagName1}`);
+    const res1 = await app.request(`/api/v1/posts?tag=${tagName1}`, {}, env);
     expect(res1.status).toBe(200);
     const data1 = await res1.json();
     expect(data1.success).toBe(true);
     expect(data1.data.length).toBe(2);
 
     // Filter by Tag2
-    const res2 = await app.request(`/api/v1/posts?tag=${tagName2}`);
+    const res2 = await app.request(`/api/v1/posts?tag=${tagName2}`, {}, env);
     expect(res2.status).toBe(200);
     const data2 = await res2.json();
     expect(data2.success).toBe(true);
@@ -114,8 +117,8 @@ describe("Tag and Filtering tests", () => {
     expect(data2.data[0].title).toContain("Post with Tag1 and Tag2");
   });
 
-  test("GET /api/v1/posts?tag=non-existent - should return empty list", async () => {
-    const res = await app.request("/api/v1/posts?tag=non-existent-tag");
+  it("gET /api/v1/posts?tag=non-existent - should return empty list", async () => {
+    const res = await app.request("/api/v1/posts?tag=non-existent-tag", {}, env);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);

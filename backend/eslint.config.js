@@ -8,8 +8,4 @@ export default antfu({
     quotes: "double",
     semi: true,
   },
-
-  ignores: [
-    "test/**",
-  ],
 });

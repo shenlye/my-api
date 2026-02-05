@@ -18,22 +18,27 @@
     "db:studio": "drizzle-kit studio",
     "cf-typegen": "wrangler types",
     "logs": "wrangler tail",
-    "logs:dev": "wrangler tail -e development"
+    "logs:dev": "wrangler tail -e development",
+    "test": "vitest"
   },
   "dependencies": {
-    "@hono/zod-openapi": "^1.2.0",
+    "@hono/zod-openapi": "^1.2.1",
     "@hono/zod-validator": "^0.7.6",
-    "@scalar/hono-api-reference": "^0.9.30",
+    "@scalar/hono-api-reference": "^0.9.40",
+    "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.1",
-    "hono": "^4.11.3",
-    "pinyin-pro": "^3.27.0",
-    "zod": "^4.2.1"
+    "hono": "^4.11.7",
+    "pinyin-pro": "^3.28.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241230.0",
-    "@types/node": "^25.0.3",
+    "@cloudflare/vitest-pool-workers": "^0.12.9",
+    "@cloudflare/workers-types": "^4.20260205.0",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node": "^25.2.0",
     "drizzle-kit": "^0.31.8",
     "typescript": "~5.9.3",
-    "wrangler": "^4.61.1"
+    "vitest": "~3.2.0",
+    "wrangler": "^4.62.0"
   }
 }

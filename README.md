@@ -7,7 +7,7 @@
 - **后端 (Backend)**: Hono + Drizzle ORM + Cloudflare D1 (Database) + Cloudflare Workers（serverless）
 - **前端 (Frontend)**: React + Vite + Shadcn UI + Cloudflare Pages
 - **部署**: Cloudflare 全家桶 (Workers + D1 + Pages + R2)
-
+- **测试**: Vitest 
 ## 快速开始
 
 ### 后端 (Cloudflare Workers)

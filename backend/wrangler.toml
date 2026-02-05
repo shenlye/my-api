@@ -5,7 +5,6 @@ compatibility_flags = [ "nodejs_compat" ]
 workers_dev = true
 preview_urls = true
 
-# 生产环境配置（默认环境）
 vars = { ALLOWED_ORIGINS = "https://admin.shenley.cn,https://shenley.cn" }
 
 [[d1_databases]]

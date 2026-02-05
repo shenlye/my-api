@@ -1,19 +1,22 @@
-import { beforeAll, describe, expect, test } from "bun:test";
+import { env } from "cloudflare:test";
 import { pinyin } from "pinyin-pro";
-import { db } from "../src/db";
+import { beforeAll, describe, expect, it } from "vitest";
+import { createDb } from "../src/db";
 import { users } from "../src/db/schema";
 import { app } from "../src/index";
+import { hashPassword } from "../src/services/auth";
 
-describe("Category and Filtering tests", () => {
+describe("category and Filtering tests", () => {
   let adminToken: string;
-  const techName = `技术-${Bun.randomUUIDv7().slice(-12)}`;
-  const lifeName = `生活-${Bun.randomUUIDv7().slice(-12)}`;
+  const db = createDb(env.DB);
+  const techName = `技术-${crypto.randomUUID().slice(-12)}`;
+  const lifeName = `生活-${crypto.randomUUID().slice(-12)}`;
   const _techSlug = pinyin(techName, { toneType: "none" }).toLowerCase().replace(/\s+/g, "-");
 
   beforeAll(async () => {
     // Ensure admin user exists
-    const passwordHash = await Bun.password.hash("admin123");
-    const username = `catadmin-${Bun.randomUUIDv7().slice(-12)}`;
+    const passwordHash = await hashPassword("admin123");
+    const username = `catadmin-${crypto.randomUUID().slice(-12)}`;
     await db
       .insert(users)
       .values({
@@ -32,7 +35,7 @@ describe("Category and Filtering tests", () => {
         identifier: username,
         password: "admin123",
       }),
-    });
+    }, env);
 
     let loginData = await loginRes.json();
     if (!loginData.success) {
@@ -44,7 +47,7 @@ describe("Category and Filtering tests", () => {
           identifier: "testadmin",
           password: "admin123",
         }),
-      });
+      }, env);
       loginData = await loginRes2.json();
     }
 
@@ -62,12 +65,12 @@ describe("Category and Filtering tests", () => {
         "Authorization": `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        title: `Tech Post ${Bun.randomUUIDv7()}`,
+        title: `Tech Post ${crypto.randomUUID()}`,
         content: "Content",
         category: techName,
         isPublished: true,
       }),
-    });
+    }, env);
     if (res1.status !== 201) {
       console.error("Failed to create tech post:", await res1.text());
     }
@@ -79,19 +82,19 @@ describe("Category and Filtering tests", () => {
         "Authorization": `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        title: `Life Post ${Bun.randomUUIDv7()}`,
+        title: `Life Post ${crypto.randomUUID()}`,
         content: "Content",
         category: lifeName,
         isPublished: true,
       }),
-    });
+    }, env);
     if (res2.status !== 201) {
       console.error("Failed to create life post:", await res2.text());
     }
   });
 
-  test("GET /api/v1/categories - should list all categories", async () => {
-    const res = await app.request("/api/v1/categories");
+  it("gET /api/v1/categories - should list all categories", async () => {
+    const res = await app.request("/api/v1/categories", {}, env);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
@@ -101,13 +104,13 @@ describe("Category and Filtering tests", () => {
     expect(names).toContain(lifeName);
   });
 
-  test("GET /api/v1/posts?category - should filter posts by category slug", async () => {
-    const categoriesRes = await app.request("/api/v1/categories");
+  it("gET /api/v1/posts?category - should filter posts by category slug", async () => {
+    const categoriesRes = await app.request("/api/v1/categories", {}, env);
     const categoriesData = await categoriesRes.json();
     const techCategory = categoriesData.data.find((c: any) => c.name === techName);
     const slug = techCategory.slug;
 
-    const res = await app.request(`/api/v1/posts?category=${slug}`);
+    const res = await app.request(`/api/v1/posts?category=${slug}`, {}, env);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
@@ -115,8 +118,8 @@ describe("Category and Filtering tests", () => {
     expect(data.data[0].title).toContain("Tech Post");
   });
 
-  test("GET /api/v1/posts?category=non-existent - should return empty list", async () => {
-    const res = await app.request("/api/v1/posts?category=non-existent");
+  it("gET /api/v1/posts?category=non-existent - should return empty list", async () => {
+    const res = await app.request("/api/v1/posts?category=non-existent", {}, env);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
