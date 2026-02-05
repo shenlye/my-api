@@ -9,5 +9,5 @@ export default antfu({
     semi: true,
   },
 
-  ignores: ["worker-configuration.d.ts", "wrangler.toml"],
+  ignores: ["worker-configuration.d.ts", "wrangler.toml", "drizzle"],
 });

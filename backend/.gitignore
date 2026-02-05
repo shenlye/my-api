@@ -22,5 +22,4 @@ bun.lockb
 *.db
 sqlite*
 
-drizzle
 dist
