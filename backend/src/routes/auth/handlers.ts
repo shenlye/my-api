@@ -1,11 +1,12 @@
-import type { Context } from "hono";
+import type { RouteHandler } from "@hono/zod-openapi";
 import type { Env } from "../../types";
+import type * as routes from "./routers";
 
-export function createLoginHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createLoginHandler(): RouteHandler<typeof routes.loginRoute, { Bindings: Env }> {
+  return async (c) => {
     const authService = c.get("authService");
 
-    const { identifier, password } = await c.req.json();
+    const { identifier, password } = c.req.valid("json");
 
     const foundUser = await authService.findUserByIdentifier(identifier);
 
@@ -41,8 +42,8 @@ export function createLoginHandler() {
   };
 }
 
-export function createRegisterHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createRegisterHandler(): RouteHandler<typeof routes.registerRoute, { Bindings: Env }> {
+  return async (c) => {
     const authService = c.get("authService");
 
     let userCount: number;
@@ -78,7 +79,7 @@ export function createRegisterHandler() {
       );
     }
 
-    const { username, email, password } = await c.req.json();
+    const { username, email, password } = c.req.valid("json");
 
     const hashedPassword = await authService.hashPassword(password);
 
@@ -101,11 +102,11 @@ export function createRegisterHandler() {
   };
 }
 
-export function createChangePasswordHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createChangePasswordHandler(): RouteHandler<typeof routes.changePasswordRoute, { Bindings: Env }> {
+  return async (c) => {
     const authService = c.get("authService");
 
-    const { oldPassword, newPassword } = await c.req.json();
+    const { oldPassword, newPassword } = c.req.valid("json");
     const payload = c.get("jwtPayload");
 
     const userId = payload?.sub;

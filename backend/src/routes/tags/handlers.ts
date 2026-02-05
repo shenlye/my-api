@@ -1,8 +1,9 @@
-import type { Context } from "hono";
+import type { RouteHandler } from "@hono/zod-openapi";
 import type { Env } from "../../types";
+import type { listTagsRoute } from "./routes";
 
-export function createListTagsHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createListTagsHandler(): RouteHandler<typeof listTagsRoute, { Bindings: Env }> {
+  return async (c) => {
     const tagService = c.get("tagService");
 
     const tags = await tagService.listAllWithCount();

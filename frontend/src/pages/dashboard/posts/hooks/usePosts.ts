@@ -3,15 +3,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { client } from "@/lib/api";
 
-export function usePosts(page: number, limit: number) {
+export function usePosts(page: number, limit: number, type?: "post" | "memo") {
   return useQuery({
-    queryKey: ["posts", page, limit],
+    queryKey: ["posts", page, limit, type],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const res = await client.api.v1.posts.$get({
         query: {
           page: page.toString(),
           limit: limit.toString(),
+          type,
         },
       }, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -30,8 +31,8 @@ export function usePost(slug: string | undefined) {
       if (!slug)
         return null;
       const token = localStorage.getItem("token");
-      const res = await client.api.v1.posts[":slug"].$get({
-        param: { slug },
+      const res = await client.api.v1.posts[":idOrSlug"].$get({
+        param: { idOrSlug: slug },
       }, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -50,8 +51,8 @@ export function usePostById(id: number | undefined) {
       if (id === undefined)
         return null;
       const token = localStorage.getItem("token");
-      const res = await client.api.v1.posts.id[":id"].$get({
-        param: { id: id.toString() },
+      const res = await client.api.v1.posts[":idOrSlug"].$get({
+        param: { idOrSlug: id.toString() },
       }, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -86,7 +87,7 @@ export function useCreatePost() {
         },
       });
       if (!res.ok) {
-        const errorData = await res.json() as any;
+        const errorData = await res.json();
         throw new Error(errorData.error?.message || "Failed to create post");
       }
       return res.json();
@@ -124,8 +125,10 @@ export function useUpdatePost() {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!res.ok)
-        throw new Error("Failed to update post");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error?.message || "Failed to update post");
+      }
       return res.json();
     },
     onSuccess: () => {
@@ -152,8 +155,10 @@ export function useDeletePost() {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!res.ok)
-        throw new Error("Failed to delete post");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error?.message || "Failed to delete post");
+      }
       return res.json();
     },
     onSuccess: () => {

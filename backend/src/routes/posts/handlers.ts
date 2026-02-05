@@ -1,12 +1,15 @@
-import type { Context } from "hono";
+import type { RouteHandler } from "@hono/zod-openapi";
 import type { Env } from "../../types";
+import type * as routes from "./routes";
 import { verify } from "hono/jwt";
+import { validateEnv } from "../../lib/env";
 
-export function createGetPostHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createGetPostHandler(): RouteHandler<typeof routes.getPostRoute, { Bindings: Env }> {
+  return async (c) => {
     const postService = c.get("postService");
-    const jwtSecret = c.env.JWT_SECRET;
-    const idOrSlug = c.req.param("idOrSlug");
+    const env = validateEnv(c.env);
+    const jwtSecret = env.JWT_SECRET;
+    const { idOrSlug } = c.req.valid("param");
 
     const authHeader = c.req.header("Authorization");
     let onlyPublished = true;
@@ -46,20 +49,16 @@ export function createGetPostHandler() {
   };
 }
 
-export function createListPostsHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createListPostsHandler(): RouteHandler<typeof routes.listPostsRoute, { Bindings: Env }> {
+  return async (c) => {
     const postService = c.get("postService");
-    const jwtSecret = c.env.JWT_SECRET;
+    const env = validateEnv(c.env);
+    const jwtSecret = env.JWT_SECRET;
 
-    const url = new URL(c.req.url);
-    const pageStr = url.searchParams.get("page") || "1";
-    const limitStr = url.searchParams.get("limit") || "10";
-    const type = url.searchParams.get("type") as "post" | "memo" | undefined;
-    const category = url.searchParams.get("category") || undefined;
-    const tag = url.searchParams.get("tag") || undefined;
+    const { page: pageStr, limit: limitStr, type, category, tag } = c.req.valid("query");
 
     const page = Math.max(1, Number(pageStr) || 1);
-    const limit = Math.min(20, Math.max(1, Number(limitStr) || 10));
+    const limit = Math.min(100, Math.max(1, Number(limitStr) || 10));
 
     // 验证 JWT token 以确定是否可以访问未发布的文章
     const authHeader = c.req.header("Authorization");
@@ -93,21 +92,21 @@ export function createListPostsHandler() {
   };
 }
 
-export function createCreatePostHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createCreatePostHandler(): RouteHandler<typeof routes.createPostRoute, { Bindings: Env }> {
+  return async (c) => {
     const postService = c.get("postService");
 
     const {
       title,
       type,
-      content,
       slug: providedSlug,
+      content,
       description,
       cover,
       isPublished,
       category,
       tags,
-    } = await c.req.json();
+    } = c.req.valid("json");
 
     let slug: string | null = null;
 
@@ -201,11 +200,11 @@ export function createCreatePostHandler() {
   };
 }
 
-export function createUpdatePostHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createUpdatePostHandler(): RouteHandler<typeof routes.updatePostRoute, { Bindings: Env }> {
+  return async (c) => {
     const postService = c.get("postService");
-    const id = Number(c.req.param("id"));
-    const values = await c.req.json();
+    const { id } = c.req.valid("param");
+    const values = c.req.valid("json");
 
     let result: any;
     try {
@@ -251,10 +250,10 @@ export function createUpdatePostHandler() {
   };
 }
 
-export function createDeletePostHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createDeletePostHandler(): RouteHandler<typeof routes.deletePostRoute, { Bindings: Env }> {
+  return async (c) => {
     const postService = c.get("postService");
-    const id = Number(c.req.param("id"));
+    const { id } = c.req.valid("param");
 
     const result = await postService.deletePost(id);
 

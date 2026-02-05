@@ -1,8 +1,9 @@
-import type { Context } from "hono";
+import type { RouteHandler } from "@hono/zod-openapi";
 import type { Env } from "../../types";
+import type { listCategoriesRoute } from "./routes";
 
-export function createListCategoriesHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
+export function createListCategoriesHandler(): RouteHandler<typeof listCategoriesRoute, { Bindings: Env }> {
+  return async (c) => {
     const categoryService = c.get("categoryService");
 
     const categories = await categoryService.listAll();
