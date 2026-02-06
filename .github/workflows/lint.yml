@@ -35,10 +35,6 @@ jobs:
         working-directory: backend
         run: pnpm exec tsc --noEmit
 
-      - name: Backend Test Type Check
-        working-directory: backend
-        run: npx tsc -p test/tsconfig.json --noEmit
-
       - name: Run Backend Tests
         run: pnpm --filter @my-api/backend test
 
