@@ -55,7 +55,7 @@ export function createListPostsHandler(): RouteHandler<typeof routes.listPostsRo
     const env = validateEnv(c.env);
     const jwtSecret = env.JWT_SECRET;
 
-    const { page: pageStr, limit: limitStr, type, category, tag } = c.req.valid("query");
+    const { page: pageStr, limit: limitStr, category, tag } = c.req.valid("query");
 
     const page = Math.max(1, Number(pageStr) || 1);
     const limit = Math.min(100, Math.max(1, Number(limitStr) || 10));
@@ -75,7 +75,7 @@ export function createListPostsHandler(): RouteHandler<typeof routes.listPostsRo
       }
     }
 
-    const { data, total } = await postService.listPosts(page, limit, type, category, tag, onlyPublished);
+    const { data, total } = await postService.listPosts(page, limit, category, tag, onlyPublished);
 
     return c.json(
       {
@@ -98,7 +98,6 @@ export function createCreatePostHandler(): RouteHandler<typeof routes.createPost
 
     const {
       title,
-      type,
       slug: providedSlug,
       content,
       description,
@@ -110,23 +109,21 @@ export function createCreatePostHandler(): RouteHandler<typeof routes.createPost
 
     let slug: string | null = null;
 
-    if (type === "post") {
-      slug = providedSlug || postService.generateSlug(title);
+    slug = providedSlug || postService.generateSlug(title);
 
-      const exists = await postService.existsBySlug(slug!);
+    const exists = await postService.existsBySlug(slug!);
 
-      if (exists) {
-        return c.json(
-          {
-            success: false,
-            error: {
-              code: "CONFLICT",
-              message: "Slug already exists, please choose a different one",
-            },
+    if (exists) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "CONFLICT",
+            message: "Slug already exists, please choose a different one",
           },
-          409,
-        );
-      }
+        },
+        409,
+      );
     }
 
     const payload = c.get("jwtPayload");
@@ -149,7 +146,6 @@ export function createCreatePostHandler(): RouteHandler<typeof routes.createPost
     try {
       result = await postService.createPost({
         title,
-        type,
         content,
         slug,
         description,

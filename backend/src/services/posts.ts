@@ -58,7 +58,6 @@ export class PostService {
   async listPosts(
     page: number,
     limit: number,
-    type?: "post" | "memo",
     categorySlug?: string,
     tagName?: string,
     onlyPublished = true,
@@ -87,7 +86,6 @@ export class PostService {
 
     const conditions = [
       isNull(posts.deletedAt),
-      ...(type ? [eq(posts.type, type)] : []),
       ...(categoryId ? [eq(posts.categoryId, categoryId)] : []),
     ];
 
@@ -148,7 +146,6 @@ export class PostService {
 
   async createPost(values: {
     title?: string | null;
-    type?: "post" | "memo";
     content: string;
     slug?: string | null;
     description?: string | null;
@@ -256,7 +253,6 @@ export class PostService {
     return {
       id: post.id,
       title: post.title,
-      type: post.type,
       slug: post.slug,
       content: post.content,
       description: post.description,

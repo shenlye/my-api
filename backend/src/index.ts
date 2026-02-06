@@ -7,6 +7,7 @@ import { defaultHook } from "./lib/route-factory";
 import { servicesMiddleware } from "./middleware/services";
 import { createAuthRouter } from "./routes/auth/index";
 import { createCategoriesRouter } from "./routes/categories/index";
+import { createMemosRouter } from "./routes/memos/index";
 import { createPostsRouter } from "./routes/posts/index";
 import { createTagsRouter } from "./routes/tags/index";
 
@@ -31,9 +32,9 @@ app.use("*", async (c, next) => {
   return corsMiddleware(c, next);
 });
 
-// 动态挂载路由
 const routes = app
   .route("/api/v1/posts", createPostsRouter())
+  .route("/api/v1/memos", createMemosRouter())
   .route("/api/v1/auth", createAuthRouter())
   .route("/api/v1/categories", createCategoriesRouter())
   .route("/api/v1/tags", createTagsRouter());
