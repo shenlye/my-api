@@ -1,4 +1,5 @@
 /* eslint-disable */
+// @ts-nocheck
 import type { D1Database, D1Migration } from "@cloudflare/workers-types";
 
 declare global {

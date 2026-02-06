@@ -27,14 +27,35 @@ export const tags = sqliteTable("tags", {
   name: text("name").notNull().unique(),
 });
 
+export const memos = sqliteTable(
+  "memos",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    content: text("content").notNull(),
+    isPublished: integer("isPublished", { mode: "boolean" }).notNull().default(false),
+    authorId: integer("authorId").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    deletedAt: integer("deletedAt", { mode: "timestamp" }),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`)
+      .$onUpdate(() => new Date()),
+  },
+  t => [
+    index("memosCreatedAtIdx").on(t.createdAt),
+    index("memosIsPublishedIdx").on(t.isPublished),
+  ],
+);
+
 export const posts = sqliteTable(
   "posts",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
     title: text("title"),
-    type: text("type", { enum: ["post", "memo"] })
-      .notNull()
-      .default("post"),
     description: text("description"),
     slug: text("slug").unique(),
     content: text("content").notNull(),
@@ -80,6 +101,7 @@ export const postsToTags = sqliteTable(
 
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
+  memos: many(memos),
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -100,6 +122,13 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
     references: [categories.id],
   }),
   postsToTags: many(postsToTags),
+}));
+
+export const memosRelations = relations(memos, ({ one }) => ({
+  author: one(users, {
+    fields: [memos.authorId],
+    references: [users.id],
+  }),
 }));
 
 export const postsToTagsRelations = relations(postsToTags, ({ one }) => ({
