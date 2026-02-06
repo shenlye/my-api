@@ -1,12 +1,12 @@
-CREATE TABLE `categories` (
+CREATE TABLE IF NOT EXISTS `categories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`slug` text NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `categories_name_unique` ON `categories` (`name`);--> statement-breakpoint
-CREATE UNIQUE INDEX `categories_slug_unique` ON `categories` (`slug`);--> statement-breakpoint
-CREATE TABLE `posts` (
+CREATE UNIQUE INDEX IF NOT EXISTS `categories_name_unique` ON `categories` (`name`);--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `categories_slug_unique` ON `categories` (`slug`);--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `posts` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`title` text,
 	`type` text DEFAULT 'post' NOT NULL,
@@ -25,11 +25,11 @@ CREATE TABLE `posts` (
 	FOREIGN KEY (`authorId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `posts_slug_unique` ON `posts` (`slug`);--> statement-breakpoint
-CREATE INDEX `createdAtIdx` ON `posts` (`createdAt`);--> statement-breakpoint
-CREATE INDEX `categoryIdIdx` ON `posts` (`categoryId`);--> statement-breakpoint
-CREATE INDEX `isPublishedIdx` ON `posts` (`isPublished`);--> statement-breakpoint
-CREATE TABLE `posts_to_tags` (
+CREATE UNIQUE INDEX IF NOT EXISTS `posts_slug_unique` ON `posts` (`slug`);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `createdAtIdx` ON `posts` (`createdAt`);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `categoryIdIdx` ON `posts` (`categoryId`);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `isPublishedIdx` ON `posts` (`isPublished`);--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `posts_to_tags` (
 	`postId` integer NOT NULL,
 	`tagId` integer NOT NULL,
 	PRIMARY KEY(`postId`, `tagId`),
@@ -37,13 +37,13 @@ CREATE TABLE `posts_to_tags` (
 	FOREIGN KEY (`tagId`) REFERENCES `tags`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `tags` (
+CREATE TABLE IF NOT EXISTS `tags` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `tags_name_unique` ON `tags` (`name`);--> statement-breakpoint
-CREATE TABLE `users` (
+CREATE UNIQUE INDEX IF NOT EXISTS `tags_name_unique` ON `tags` (`name`);--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `users` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`role` text DEFAULT 'user' NOT NULL,
 	`username` text NOT NULL,
@@ -53,5 +53,5 @@ CREATE TABLE `users` (
 	`updatedAt` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);--> statement-breakpoint
-CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
+CREATE UNIQUE INDEX IF NOT EXISTS `users_username_unique` ON `users` (`username`);--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `users_email_unique` ON `users` (`email`);
